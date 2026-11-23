@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="auto">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pecuaria</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1F4D3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pecuaria">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===================== TEMA · "Campo al amanecer" =====================
+   60 % base (crema)  ·  30 % secundario (verde bosque)  ·  10 % acento (yema)
+   ===================================================================== */
+:root{
+  /* 60 — base */
+  --bg:#F6F1E7; --bg-outer:#E9E1D1; --surface:#FFFDF8; --surface2:#EFE8DA; --outline:#E4DACA;
+  --text:#1E2A22; --muted:#6B6A5E;
+  /* 30 — secundario */
+  --primary:#1F4D3A; --primary-2:#2A6149; --on-primary:#F6F1E7; --primary-soft:#DCE8DF;
+  /* 10 — acento */
+  --accent:#E8A33D; --on-accent:#2F1E02; --accent-soft:#FBEBD0; --accent-ink:#9A6210;
+  /* semánticos */
+  --danger:#B23A2E; --danger-soft:#F8E1DC; --warn:#8E5A06; --warn-soft:#F8EAD1; --ok:#2F6B4A; --ok-soft:#DDEDE2;
+  /* especies (acentos suaves) */
+  --c-gallina:#B8702A; --c-vaca:#2F7A55; --c-oveja:#5A73A0; --c-venta:#8B5A86;
+  --hill1:#2A6149; --hill2:#1F4D3A; --hill3:#173B2C; --sun:#E8A33D;
+  --shadow:0 1px 2px rgba(31,77,58,.06),0 6px 18px rgba(31,77,58,.07);
+  --shadow-lg:0 10px 30px rgba(20,40,30,.18);
+  --r:18px; --ease:cubic-bezier(.2,.8,.2,1); --ease-bounce:cubic-bezier(.34,1.4,.64,1);
+  --f-display:Nunito,ui-rounded,system-ui,sans-serif; --f-body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){ html[data-theme="auto"]{ color-scheme:dark;
+  --bg:#0F1B15; --bg-outer:#09110D; --surface:#16251D; --surface2:#1E3027; --outline:#2A3F33;
+  --text:#F1EBDD; --muted:#A9B3A6;
+  --primary:#9ED1B2; --primary-2:#1D3A2D; --on-primary:#0F1B15; --primary-soft:#1F3A2C;
+  --accent:#F2B552; --on-accent:#2A1A00; --accent-soft:#3A2C12; --accent-ink:#F7C77A;
+  --danger:#F2A69B; --danger-soft:#43211C; --warn:#F5C77E; --warn-soft:#3A2C12; --ok:#9ED1B2; --ok-soft:#1F3A2C;
+  --c-gallina:#E2A367; --c-vaca:#86CFA6; --c-oveja:#A5B8E0; --c-venta:#D2A6CE;
+  --hill1:#1F4434; --hill2:#183629; --hill3:#112A1F; --sun:#F2B552;
+  --shadow:0 1px 0 rgba(255,255,255,.03); --shadow-lg:0 10px 30px rgba(0,0,0,.5); }}
+html[data-theme="dark"]{ color-scheme:dark;
+  --bg:#0F1B15; --bg-outer:#09110D; --surface:#16251D; --surface2:#1E3027; --outline:#2A3F33;
+  --text:#F1EBDD; --muted:#A9B3A6;
+  --primary:#9ED1B2; --primary-2:#1D3A2D; --on-primary:#0F1B15; --primary-soft:#1F3A2C;
+  --accent:#F2B552; --on-accent:#2A1A00; --accent-soft:#3A2C12; --accent-ink:#F7C77A;
+  --danger:#F2A69B; --danger-soft:#43211C; --warn:#F5C77E; --warn-soft:#3A2C12; --ok:#9ED1B2; --ok-soft:#1F3A2C;
+  --c-gallina:#E2A367; --c-vaca:#86CFA6; --c-oveja:#A5B8E0; --c-venta:#D2A6CE;
+  --hill1:#1F4434; --hill2:#183629; --hill3:#112A1F; --sun:#F2B552;
+  --shadow:0 1px 0 rgba(255,255,255,.03); --shadow-lg:0 10px 30px rgba(0,0,0,.5); }
+/* En modo oscuro, el verde "estructural" (barras, encabezados) se mantiene profundo */
+:root{ --band:#1F4D3A; --on-band:#F6F1E7; --band-muted:rgba(246,241,231,.72); }
+@media (prefers-color-scheme:dark){ html[data-theme="auto"]{ --band:#173226; --on-band:#F1EBDD; } }
+html[data-theme="dark"]{ --band:#173226; --on-band:#F1EBDD; }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg-outer);color:var(--text);font-family:var(--f-body);font-size:15px;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow-x:hidden}
+@media (min-width:480px){ .app{box-shadow:0 0 0 1px var(--outline),0 20px 60px rgba(0,0,0,.08)} }
+h1,h2,h3,.dtitle,.stat .v,.hubcard .t,.hubcard .big b,.tile .cnt,.num{font-family:var(--f-display)}
+
+/* ---------- Encabezado ilustrado (pantallas principales) ---------- */
+.herotop{position:relative;background:var(--band);color:var(--on-band);padding:18px 18px 64px;overflow:hidden;border-radius:0 0 28px 28px}
+.herotop .scene{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:96px;pointer-events:none}
+.herotop .row1{display:flex;align-items:center;gap:8px;position:relative;z-index:1}
+.herotop .kicker{font-size:13px;color:var(--band-muted);letter-spacing:.2px}
+.herotop h1{margin:2px 0 0;font-size:30px;font-weight:900;letter-spacing:-.4px;line-height:1.1;position:relative;z-index:1}
+.herotop h1 em{font-style:normal;color:var(--sun)}
+.herotop .iconbtn{color:var(--on-band);margin-left:auto;background:rgba(255,255,255,.08)}
+.herotop .iconbtn:hover{background:rgba(255,255,255,.16)}
+.herotop + .content{margin-top:-38px;position:relative;z-index:2}
+
+/* Barra superior de sub-pantallas */
+.topbar{position:sticky;top:0;z-index:20;background:var(--band);color:var(--on-band);display:flex;align-items:center;gap:4px;padding:10px 8px 10px 8px;min-height:62px;transition:box-shadow .2s}
+.topbar.scrolled{box-shadow:0 4px 16px rgba(0,0,0,.18)}
+.topbar h1{font-size:20px;font-weight:800;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:10px}
+.topbar h1 .dot{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:17px;background:rgba(255,255,255,.12)}
+.topbar .sub{display:block;font-size:12px;color:var(--band-muted);font-weight:400;font-family:var(--f-body)}
+.iconbtn{width:44px;height:44px;border:0;background:transparent;border-radius:14px;display:grid;place-items:center;cursor:pointer;color:inherit;flex:none;transition:background .15s,transform .15s}
+.iconbtn:hover{background:rgba(255,255,255,.12)}
+.iconbtn:active{transform:scale(.92)}
+.iconbtn svg{width:24px;height:24px}
+
+.content{padding:16px 16px 120px;flex:1}
+.section-title{font-family:var(--f-display);font-size:17px;font-weight:800;color:var(--text);margin:26px 4px 12px;display:flex;align-items:center;gap:8px}
+.section-title small{font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted);margin-left:auto}
+
+/* ---------- Barra inferior (30 %) con indicador en acento (10 %) ---------- */
+.bottomnav{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);width:min(416px,calc(100% - 24px));background:var(--band);border-radius:24px;display:flex;z-index:30;padding:8px 6px calc(8px + env(safe-area-inset-bottom));box-shadow:var(--shadow-lg)}
+.navitem{flex:1;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--band-muted);cursor:pointer;padding:2px 0;font-weight:500}
+.navitem .pill{width:52px;height:32px;border-radius:12px;display:grid;place-items:center;transition:background .25s var(--ease),transform .25s var(--ease-bounce)}
+.navitem svg{width:23px;height:23px}
+.navitem.on{color:var(--on-band)}
+.navitem.on .pill{background:var(--accent);color:var(--on-accent);transform:translateY(-1px)}
+.navitem:active .pill{transform:scale(.9)}
+
+/* ---------- Tarjetas y métricas ---------- */
+.card{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--outline)}
+.pad{padding:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{padding:14px 15px;border-radius:var(--r);background:var(--surface);border:1px solid var(--outline);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat .v{font-size:25px;font-weight:900;line-height:1.1;color:var(--primary);letter-spacing:-.3px}
+.stat .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+.stat.accent .v{color:var(--ac,var(--primary))}
+.stat.accent::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:0 4px 4px 0;background:var(--ac,var(--primary));opacity:.85}
+.stat.feature{grid-column:1/-1;background:var(--band);border:0;color:var(--on-band);padding:18px 18px 16px;display:flex;align-items:flex-end;gap:12px}
+.stat.feature::before{display:none}
+.stat.feature .v{color:var(--sun);font-size:40px}
+.stat.feature .l{color:var(--band-muted);font-size:13px}
+.stat.feature .side{margin-left:auto;text-align:right;font-size:13px;color:var(--band-muted)}
+.stat.feature .side b{display:block;color:var(--on-band);font-family:var(--f-display);font-size:20px}
+.strip{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none}
+.strip::-webkit-scrollbar{display:none}
+.strip .stat{min-width:118px;flex:1}
+
+/* ---------- Hub de especies ---------- */
+.hub{display:flex;flex-direction:column;gap:14px}
+.hubcard{position:relative;display:flex;align-items:center;gap:14px;padding:18px;border-radius:24px;cursor:pointer;border:1px solid var(--outline);background:var(--surface);text-align:left;width:100%;box-shadow:var(--shadow);overflow:hidden;transition:transform .18s var(--ease),box-shadow .18s}
+.hubcard::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:color-mix(in srgb,var(--ac) 12%,transparent);transition:transform .4s var(--ease)}
+.hubcard:hover::after{transform:scale(1.15)}
+.hubcard:active{transform:scale(.98)}
+.hubcard .emo{font-size:36px;width:66px;height:66px;border-radius:20px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 16%,var(--surface));flex:none;position:relative;z-index:1}
+.hubcard .t{font-size:21px;font-weight:900;position:relative;z-index:1}
+.hubcard .m{font-size:13px;color:var(--muted);margin-top:3px;position:relative;z-index:1}
+.hubcard .big{margin-left:auto;text-align:right;position:relative;z-index:1}
+.hubcard .big b{display:block;font-size:30px;font-weight:900;color:var(--ac)}
+.hubcard .big span{font-size:11px;color:var(--muted)}
+.hubcard .go{position:absolute;right:16px;bottom:12px;color:var(--muted);opacity:.5}
+
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:var(--r);background:var(--surface);border:1px solid var(--outline);cursor:pointer;text-align:left;min-height:132px;box-shadow:var(--shadow);transition:transform .18s var(--ease),border-color .2s}
+.tile:hover{border-color:color-mix(in srgb,var(--ac) 50%,var(--outline))}
+.tile:active{transform:scale(.97)}
+.tile .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 15%,var(--surface));font-size:22px}
+.tile .n{font-weight:700;font-family:var(--f-display);font-size:16px}
+.tile .c{font-size:12px;color:var(--muted);margin-top:2px}
+.tile .cnt{font-size:24px;font-weight:900;color:var(--ac);margin-top:auto}
+
+/* ---------- Listas ---------- */
+.list{display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--outline);border-radius:var(--r);cursor:pointer;text-align:left;width:100%;transition:transform .15s var(--ease),background .15s}
+.row:hover{background:color-mix(in srgb,var(--surface2) 45%,var(--surface))}
+.row:active{transform:scale(.985)}
+.av{width:46px;height:46px;border-radius:15px;flex:none;display:grid;place-items:center;font-size:21px;font-weight:800;font-family:var(--f-display);background:color-mix(in srgb,var(--ac,var(--primary)) 14%,var(--surface));color:var(--ac,var(--primary));overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av svg{width:22px;height:22px}
+.row .tx{flex:1;min-width:0}
+.row .t1{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .t2{font-size:13px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .rt{text-align:right;flex:none;font-size:12px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.row .rt b{display:block;font-size:15px;font-family:var(--f-display);font-weight:800}
+
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}
+.badge.warn{background:var(--warn-soft);color:var(--warn)}
+.badge.bad{background:var(--danger-soft);color:var(--danger)}
+.badge.info{background:var(--primary-soft);color:var(--primary)}
+.badge.hot{background:var(--accent);color:var(--on-accent)}
+
+/* ---------- Búsqueda, chips, segmentado ---------- */
+.search{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--outline);border-radius:18px;padding:0 16px;height:52px;margin:4px 0 12px;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.search:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+.search svg{width:22px;height:22px;color:var(--muted);flex:none}
+.search input{border:0;background:transparent;outline:0;flex:1;height:100%;font-size:16px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none;padding:1px}
+.chip{border:1px solid var(--outline);background:var(--surface);border-radius:999px;padding:8px 15px;font-size:13.5px;cursor:pointer;white-space:nowrap;font-weight:500;transition:all .2s var(--ease)}
+.chip.on{background:var(--band);border-color:var(--band);color:var(--on-band)}
+.seg{display:flex;background:var(--surface2);border-radius:16px;padding:4px;margin:4px 0 14px;position:relative}
+.seg button{flex:1;border:0;background:transparent;border-radius:12px;padding:10px;cursor:pointer;font-weight:600;color:var(--muted);transition:all .2s var(--ease)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+
+/* ---------- Alertas ---------- */
+.alert{display:flex;gap:12px;align-items:center;padding:13px 14px;border-radius:16px;cursor:pointer;border:1px solid transparent;width:100%;text-align:left;margin-bottom:8px;transition:transform .15s var(--ease)}
+.alert:active{transform:scale(.985)}
+.alert .ai{font-size:20px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.45);flex:none}
+.alert b{display:block;font-weight:600}
+.alert span{font-size:13px;opacity:.85}
+.alert.warn{background:var(--warn-soft);color:var(--warn);border-color:color-mix(in srgb,var(--warn) 18%,transparent)}
+.alert.bad{background:var(--danger-soft);color:var(--danger);border-color:color-mix(in srgb,var(--danger) 18%,transparent)}
+.alert.info{background:var(--primary-soft);color:var(--primary);border-color:color-mix(in srgb,var(--primary) 18%,transparent)}
+html[data-theme="dark"] .alert .ai{background:rgba(0,0,0,.2)}
+
+/* ---------- Botones ---------- */
+.btn{border:0;border-radius:16px;padding:13px 20px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;transition:transform .15s var(--ease),filter .15s}
+.btn:active{transform:scale(.97)}
+.btn svg{width:18px;height:18px}
+.btn.fill{background:var(--accent);color:var(--on-accent)}
+.btn.fill:hover{filter:brightness(1.04)}
+.btn.tonal{background:var(--primary-soft);color:var(--primary)}
+.btn.out{background:transparent;border:1px solid var(--outline)}
+.btn.danger{background:var(--danger-soft);color:var(--danger)}
+.btn.block{width:100%}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap}
+.btnrow .btn{flex:1}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.quick button{border:1px solid var(--outline);background:var(--surface);border-radius:18px;padding:14px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:500;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s var(--ease)}
+.quick button:active{transform:scale(.95)}
+.quick button span{font-size:22px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--accent-soft)}
+
+.fab{position:fixed;bottom:104px;right:max(20px,calc(50% - 200px));width:60px;height:60px;border-radius:20px;border:0;background:var(--accent);color:var(--on-accent);box-shadow:0 8px 20px color-mix(in srgb,var(--accent) 45%,transparent);cursor:pointer;display:grid;place-items:center;z-index:25;transition:transform .2s var(--ease-bounce)}
+.fab:hover{transform:rotate(90deg)}
+.fab:active{transform:scale(.9)}
+.fab svg{width:28px;height:28px}
+
+/* ---------- Ficha de detalle ---------- */
+.hero{height:220px;border-radius:26px;overflow:hidden;position:relative;background:color-mix(in srgb,var(--ac) 14%,var(--surface));display:grid;place-items:center;font-size:96px;box-shadow:var(--shadow)}
+.hero .scene{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:90px}
+.hero .big-emo{position:relative;z-index:1;filter:drop-shadow(0 8px 10px rgba(0,0,0,.15))}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+.hero .ph{position:absolute;right:12px;top:12px;z-index:3}
+.hero label{background:rgba(20,30,24,.62);backdrop-filter:blur(6px);color:#fff;border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.hero label svg{width:18px;height:18px}
+.hero input{display:none}
+.dtitle{margin:18px 2px 8px;font-size:28px;font-weight:900;letter-spacing:-.4px}
+.dsub{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kv div{background:var(--surface);padding:12px 14px;border-radius:14px;border:1px solid var(--outline)}
+.kv small{display:block;color:var(--muted);font-size:12px;margin-bottom:3px}
+.kv span{font-weight:600}
+.kv .full{grid-column:1/-1}
+.rel{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.relcard{padding:12px;border-radius:var(--r);background:var(--surface);border:1px solid var(--outline);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left;transition:transform .15s var(--ease)}
+.relcard:active{transform:scale(.97)}
+.relcard.none{opacity:.55;cursor:default}
+.relcard small{display:block;color:var(--muted);font-size:11px}
+.relcard b{font-family:var(--f-display);font-weight:800}
+.steps{display:flex;gap:4px;margin:10px 0 10px;height:10px;border-radius:5px;overflow:hidden;background:var(--surface2)}
+.steps div{height:100%;background:transparent}
+.steps div.on{background:linear-gradient(90deg,var(--ac,var(--primary)),color-mix(in srgb,var(--ac,var(--primary)) 70%,var(--accent)));border-radius:5px;transform-origin:left;animation:grow .8s var(--ease) both}
+
+/* ---------- Gráficas ---------- */
+.chart svg{width:100%;height:auto;display:block;overflow:visible}
+.chart .axis{fill:var(--muted);font-size:10px;font-family:var(--f-body)}
+.chart .ln{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s var(--ease) .1s forwards}
+.chart .ar{opacity:0;animation:fade .8s ease .5s forwards}
+.chart .pt{transform-box:fill-box;transform-origin:center;transform:scale(0);animation:pop .4s var(--ease-bounce) 1s forwards}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar .bl{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.bar .bl span:last-child{font-weight:700;font-family:var(--f-display)}
+.bar .bt{height:12px;border-radius:6px;background:var(--surface2);overflow:hidden}
+.bar .bf{height:100%;border-radius:6px;background:var(--ac,var(--primary));transform-origin:left;animation:grow .9s var(--ease) both}
+.bar:nth-child(2) .bf{animation-delay:.06s}.bar:nth-child(3) .bf{animation-delay:.12s}.bar:nth-child(4) .bf{animation-delay:.18s}.bar:nth-child(5) .bf{animation-delay:.24s}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend b{color:var(--text);font-family:var(--f-display)}
+
+/* ---------- Estado vacío ---------- */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .e{font-size:44px;margin:0 auto 12px;width:88px;height:88px;border-radius:28px;display:grid;place-items:center;background:var(--accent-soft)}
+.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:4px;font-family:var(--f-display);font-weight:800}
+
+/* ---------- Hoja inferior ---------- */
+.scrim{position:fixed;inset:0;background:rgba(15,27,21,.5);backdrop-filter:blur(2px);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;bottom:0;left:50%;width:min(440px,100%);transform:translate(-50%,105%);background:var(--surface);border-radius:30px 30px 0 0;z-index:60;max-height:92vh;display:flex;flex-direction:column;transition:transform .32s var(--ease),visibility 0s .32s;visibility:hidden}
+.sheet.on{transform:translate(-50%,0);visibility:visible;transition:transform .42s var(--ease-bounce)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--outline);margin:10px auto 2px}
+.sheet h2{margin:8px 22px 4px;font-size:22px;font-weight:900}
+.sheet .body{overflow-y:auto;padding:8px 22px 12px}
+.sheet .foot{padding:12px 22px calc(16px + env(safe-area-inset-bottom));border-top:1px solid var(--outline);display:flex;gap:10px}
+.sheet .foot .btn{flex:1}
+.field{margin:14px 0}
+.field label{display:block;font-size:13px;color:var(--muted);margin:0 0 6px 4px;font-weight:500}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--outline);background:var(--bg);border-radius:14px;padding:12px 14px;font-size:16px;outline:0;min-height:50px;transition:border-color .2s,box-shadow .2s}
+.field textarea{min-height:84px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 18%,transparent)}
+.field .err{color:var(--danger);font-size:12px;margin:4px 4px 0;display:none}
+.field.bad input,.field.bad select{border-color:var(--danger);animation:shake .35s}
+.field.bad .err{display:block}
+.formerr{background:var(--danger-soft);color:var(--danger);border-radius:14px;padding:11px 13px;font-size:14px;margin-top:8px;display:none;animation:shake .35s}
+.hint{font-size:12px;color:var(--muted);margin:5px 4px 0}
+
+/* ---------- Diálogo ---------- */
+.dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-46%) scale(.94);opacity:0;pointer-events:none;background:var(--surface);border-radius:28px;padding:24px;width:min(340px,90vw);z-index:70;transition:all .25s var(--ease-bounce);box-shadow:var(--shadow-lg)}
+.dialog.on{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.dialog h3{margin:0 0 8px;font-size:21px;font-weight:900}
+.dialog p{margin:0 0 20px;color:var(--muted);line-height:1.5}
+.dialog .btnrow{justify-content:flex-end}
+.dialog .btnrow .btn{flex:none}
+
+/* ---------- Snackbar ---------- */
+.snack{position:fixed;left:50%;bottom:178px;transform:translate(-50%,16px) scale(.96);background:var(--band);color:var(--on-band);padding:14px 18px;border-radius:16px;font-size:14px;font-weight:500;z-index:80;opacity:0;pointer-events:none;transition:all .3s var(--ease-bounce);width:min(400px,calc(100% - 32px));box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px}
+.snack::before{content:"✓";width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:13px;font-weight:800;flex:none}
+.snack.on{opacity:1;transform:translate(-50%,0) scale(1)}
+.snack.err{background:var(--danger);color:#fff}
+.snack.err::before{content:"!";background:#fff;color:var(--danger)}
+
+/* ---------- Login ---------- */
+.login{min-height:100vh;display:flex;flex-direction:column}
+.login .herotop{padding:56px 24px 110px;text-align:center;border-radius:0 0 36px 36px}
+.login .herotop h1{font-size:38px}
+.login .herotop p{margin:6px 0 0;color:var(--band-muted);position:relative;z-index:1}
+.login .logo{font-size:44px;position:relative;z-index:1;margin-bottom:6px}
+.login .rolelist{display:flex;flex-direction:column;gap:10px;padding:0 20px;margin-top:-56px;position:relative;z-index:2}
+
+/* ---------- Animaciones (sutiles) ---------- */
+.anim-in{animation:in .42s var(--ease) both}
+.quieto .anim-in{animation:none}
+.quieto #lista .anim-in{animation:in .3s var(--ease) both}
+.page{animation:page .35s var(--ease) both}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes page{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes fade{to{opacity:1}}
+@keyframes pop{to{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes sway{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.scene .sun{animation:sway 6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important} .chart .ln{stroke-dashoffset:0} }
+
+.muted{color:var(--muted)}
+.mt{margin-top:12px}
+.note{font-size:12px;color:var(--muted);text-align:center;margin:28px 0 0;line-height:1.5}
+
+/* ---------- Indicador de sincronización ---------- */
+.syncpill{border:0;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 6px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(255,255,255,.12);color:var(--on-band);cursor:pointer;white-space:nowrap;max-width:190px;flex:none;font-family:var(--f-body)}
+.syncpill .tx{overflow:hidden;text-overflow:ellipsis}
+.syncpill .si{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:rgba(255,255,255,.18);flex:none}
+.syncpill.ok .si{background:var(--ok-soft);color:var(--ok)}
+.syncpill.pend .si{background:var(--accent);color:var(--on-accent)}
+.syncpill.off .si{background:rgba(255,255,255,.25)}
+.syncpill.err{background:var(--danger)}
+.syncpill.err .si{background:#fff;color:var(--danger)}
+.syncpill.gira .si{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.topbar .syncpill{padding:0 6px}
+.topbar .syncpill .tx{display:none}
+.herotop .kicker{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.herotop .iconbtn{margin-left:0}
+.card .syncpill{background:var(--surface2);color:var(--text);max-width:none}
+.card .syncpill.err{background:var(--danger-soft);color:var(--danger)}
+.btn:disabled{opacity:.6;cursor:wait}
+</style>
+
+</head>
+<body>
+<div class="app" id="app"></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<div class="dialog" id="dialog" role="alertdialog"></div>
+<div class="snack" id="snack"></div>
+
+<script>
+/* =====================================================================
+   Pecuaria · prototipo web
+   Espejo de la app Android: Modelos.kt (roles/permisos), Calculos.kt
+   (cartones, postura, gestación, retiro) y PedidosRepositorio.kt (stock).
+   Los datos son de demostración y viven solo en este navegador.
+   ===================================================================== */
+
+// ---------------- Iconos (Material Symbols, trazos SVG) ----------------
+const P = {
+  home:'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+  paw:'M4.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm4.5-3a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm6 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm4.5 3a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM17.3 14.9c-.9-1-1.6-1.9-2.5-2.9-.5-.5-1-1.1-1.7-1.3-.1 0-.2-.1-.3-.1-.3-.1-.5-.1-.8-.1s-.6 0-.8.1c-.1 0-.2.1-.3.1-.7.2-1.2.8-1.7 1.3-.9 1-1.6 1.9-2.5 2.9-1.3 1.3-2.9 2.8-2.6 4.8.3 1 1 2 2.3 2.3.7.1 3-.5 5.5-.5h.2c2.5 0 4.8.6 5.5.5 1.3-.3 2-1.3 2.3-2.3.3-2.1-1.3-3.6-2.6-4.8z',
+  cart:'M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM1 2v2h2l3.6 7.6-1.4 2.4c-.1.3-.2.6-.2 1 0 1.1.9 2 2 2h12v-2H7.4c-.1 0-.2-.1-.2-.2v-.1l.9-1.7h7.4c.8 0 1.4-.4 1.7-1l3.6-6.5c.1-.2.2-.3.2-.5 0-.6-.4-1-1-1H5.2l-.9-2H1zm16 16a2 2 0 1 0 0 4 2 2 0 0 0 0-4z',
+  chart:'M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z',
+  menu:'M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z',
+  back:'M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z',
+  plus:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
+  search:'M15.5 14h-.8l-.3-.3A6.5 6.5 0 1 0 9.5 16c1.6 0 3.1-.6 4.2-1.6l.3.3v.8l5 5 1.5-1.5-5-5zm-6 0C7 14 5 12 5 9.5S7 5 9.5 5 14 7 14 9.5 12 14 9.5 14z',
+  edit:'M3 17.2V21h3.8L17.8 9.9l-3.7-3.7L3 17.2zM20.7 7a1 1 0 0 0 0-1.4l-2.3-2.3a1 1 0 0 0-1.4 0l-1.8 1.8 3.7 3.7L20.7 7z',
+  del:'M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z',
+  moon:'M12 3a9 9 0 1 0 9 9c0-.5 0-1-.1-1.4A5.4 5.4 0 0 1 12 3.1V3z',
+  sun:'M6.8 4.8 5 3.1 3.6 4.5l1.8 1.8 1.4-1.5zM4 10.5H1v2h3v-2zm9-9.95h-2V3.5h2V.55zm7.45 3.91-1.4-1.4-1.8 1.8 1.4 1.4 1.8-1.8zM17.24 18.16l1.79 1.8 1.41-1.41-1.8-1.79-1.4 1.4zM20 10.5v2h3v-2h-3zm-8-5a6 6 0 1 0 0 12 6 6 0 0 0 0-12zm-1 16.95h2V19.5h-2v2.95zm-7.45-3.91 1.41 1.41 1.79-1.8-1.41-1.41-1.79 1.8z',
+  logout:'M17 7l-1.4 1.4 2.6 2.6H8v2h10.2l-2.6 2.6L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z',
+  cam:'M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4zM9 2 7.2 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.2L15 2H9zm3 15a5 5 0 1 1 0-10 5 5 0 0 1 0 10z',
+  box:'M20 2H4c-1 0-2 .9-2 2v3c0 .7.4 1.3 1 1.7V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.6-.4 1-1 1-1.7V4c0-1.1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z',
+  med:'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z',
+  grass:'M12 20H2v-2h5.75A8.6 8.6 0 0 0 4 11.5V9a11 11 0 0 1 8 5.4V20zm10-2h-5.75c.7-1.1 1.2-2.4 1.4-3.7L19 14c.5-.1 1 .2 1.2.7l.8 3.3zM13 12c0-4.4 2.8-8.2 7-9.5v2.6A7.5 7.5 0 0 0 15 12h-2z',
+  user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z',
+  money:'M11.8 10.9c-2.3-.6-3-1.2-3-2.1 0-1.1 1-1.9 2.7-1.9 1.8 0 2.4.8 2.5 2.1h2.2c-.1-1.7-1.1-3.3-3.2-3.8V3h-3v2.2c-1.9.4-3.5 1.7-3.5 3.6 0 2.3 1.9 3.5 4.7 4.1 2.5.6 3 1.5 3 2.4 0 .7-.5 1.8-2.7 1.8-2.1 0-2.9-.9-3-2.1H5.3c.1 2.2 1.8 3.5 3.7 3.9V21h3v-2.2c1.9-.4 3.5-1.5 3.5-3.6 0-2.8-2.4-3.8-4.7-4.3z',
+  heart:'M12 21.4 10.6 20C5.4 15.4 2 12.3 2 8.5 2 5.4 4.4 3 7.5 3c1.7 0 3.4.8 4.5 2.1A6 6 0 0 1 16.5 3C19.6 3 22 5.4 22 8.5c0 3.8-3.4 6.9-8.6 11.5L12 21.4z',
+  reset:'M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z',
+  check:'M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z',
+  close:'M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z',
+  shield:'M12 1 3 5v6c0 5.6 3.8 10.7 9 12 5.2-1.3 9-6.4 9-12V5l-9-4z',
+  egg:'M12 2C8.1 2 5 8.2 5 13a7 7 0 0 0 14 0c0-4.8-3.1-11-7-11z',
+};
+const ic = (n,cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${P[n]}"/></svg>`;
+
+// ---------------- Utilidades ----------------
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jp = o => esc(JSON.stringify(o));
+const uid = () => Math.random().toString(36).slice(2,10);
+const pad2 = n => String(n).padStart(2,'0');
+const isoDe = d => `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const hoy = () => isoDe(new Date());
+const sumarDias = (iso, n) => { const d = new Date(iso+'T12:00:00'); d.setDate(d.getDate()+n); return isoDe(d); };
+const diasEntre = (a, b) => Math.round((new Date(b+'T12:00:00') - new Date(a+'T12:00:00'))/86400000);
+const fFecha = iso => iso ? new Date(iso+'T12:00:00').toLocaleDateString('es-CR',{day:'numeric',month:'short',year:'numeric'}) : '—';
+const fCorta = iso => new Date(iso+'T12:00:00').toLocaleDateString('es-CR',{day:'numeric',month:'short'});
+const num = n => Number(n||0).toLocaleString('es-CR');
+const dinero = n => `${CFG.moneda} ${Number(n||0).toLocaleString('es-CR',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+const dineroCorto = n => `${CFG.moneda} ${Number(n||0).toLocaleString('es-CR',{maximumFractionDigits:0})}`;
+function edad(nac){ if(!nac) return '—'; const m = Math.floor(diasEntre(nac, hoy())/30.44);
+  if (m >= 24) return `${Math.floor(m/12)} años`; if (m >= 1) return `${m} meses`; return `${diasEntre(nac,hoy())} días`; }
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+
+// ---------------- Roles (Modelos.kt) ----------------
+const ROLES = {
+  ADMIN:{etq:'Administrador', p:['INICIO','USUARIOS','AVICOLA','GANADERIA','STOCK','PEDIDOS','REPORTES','ENFERMEDADES','POTREROS']},
+  GERENTE:{etq:'Gerente', p:['INICIO','AVICOLA','GANADERIA','STOCK','PEDIDOS','REPORTES','ENFERMEDADES','POTREROS']},
+  OPERARIO:{etq:'Operario', p:['INICIO','AVICOLA','GANADERIA','STOCK','ENFERMEDADES','POTREROS']},
+  VETERINARIO:{etq:'Veterinario', p:['INICIO','AVICOLA','GANADERIA','ENFERMEDADES']},
+  CONTADOR:{etq:'Contador', p:['INICIO','PEDIDOS','REPORTES','STOCK']},
+};
+const puede = p => !!S.rol && ROLES[S.rol].p.includes(p);
+
+// ---------------- Especies (cada una separada) ----------------
+const ESP = {
+  gallinas:{nombre:'Gallinas', valor:'Gallina', emo:'🐔', ac:'var(--c-gallina)', perm:'AVICOLA'},
+  vacas:{nombre:'Vacas', valor:'Vaca', emo:'🐄', ac:'var(--c-vaca)', perm:'GANADERIA', gest:283, celo:21, cria:'ternero'},
+  ovejas:{nombre:'Ovejas', valor:'Oveja', emo:'🐑', ac:'var(--c-oveja)', perm:'GANADERIA', gest:150, celo:17, cria:'cordero'},
+};
+const espDeValor = v => Object.keys(ESP).find(k => ESP[k].valor === v);
+const HUEVOS_POR_CARTON = 15;
+
+// =====================================================================
+//  ALMACENAMIENTO OFFLINE + SINCRONIZACIÓN CON GITHUB
+//  - Todo se guarda primero en el teléfono (IndexedDB).
+//  - Cada registro lleva _mod (marca de tiempo del último cambio).
+//  - Los borrados se guardan como "lápidas" en DB._borrados para que
+//    no reaparezcan al fusionar con otro dispositivo.
+//  - Datos: datos.json en un repo privado. Fotos: fotos/<id>.jpg.
+// =====================================================================
+const LS = 'pecuaria-web-demo-v1';               // clave antigua (migración)
+let DB, CFG;
+const META = { gh:null, sha:'', ultima:0, sucio:false, cambios:0, rol:'' };
+
+// ---------- IndexedDB mínimo (con respaldo en memoria si no existe) ----------
+const IDB = (() => {
+  let dbp = null; const mem = {kv:new Map(), fotos:new Map()};
+  function abrir(){
+    if (dbp) return dbp;
+    dbp = new Promise((res) => {
+      try {
+        const r = indexedDB.open('pecuaria', 1);
+        r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('fotos'); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => res(null);
+      } catch(e){ res(null); }
+    });
+    return dbp;
+  }
+  async function op(store, modo, fn){
+    const db = await abrir();
+    if (!db){ const r = fn(null, mem[store]); return r?.result; }
+    return new Promise((res, rej) => {
+      const tx = db.transaction(store, modo); const st = tx.objectStore(store);
+      const req = fn(st); tx.oncomplete = () => res(req?.result); tx.onerror = () => rej(tx.error);
+    });
+  }
+  return {
+    get:(s,k)=>op(s,'readonly',(st,m)=> st ? st.get(k) : {result:m.get(k)}),
+    set:(s,k,v)=>op(s,'readwrite',(st,m)=> st ? st.put(v,k) : (m.set(k,v),{})),
+    del:(s,k)=>op(s,'readwrite',(st,m)=> st ? st.delete(k) : (m.delete(k),{})),
+    keys:(s)=>op(s,'readonly',(st,m)=> st ? st.getAllKeys() : {result:[...m.keys()]}),
+  };
+})();
+
+const ahora = () => Date.now();
+const toca = r => { if (r) r._mod = ahora(); return r; };   // marca un registro como cambiado
+const COLECCIONES = ['galpones','huevos','perdidas','potreros','animales','tratamientos','enfermedades','stock','compradores','pedidos','gastos','usuarios'];
+function vacia(){ const o = {_borrados:{}}; COLECCIONES.forEach(c=>o[c]=[]); return o; }
+function normalizar(d){ d = d || {}; COLECCIONES.forEach(c=>{ if(!Array.isArray(d[c])) d[c]=[]; }); if(!d._borrados) d._borrados={}; return d; }
+
+let tGuardar = null;
+function guardarDB(huboCambio = true){
+  if (huboCambio){ META.sucio = true; META.cambios++; }
+  clearTimeout(tGuardar);
+  tGuardar = setTimeout(async ()=>{
+    try { await IDB.set('kv','estado',{DB, CFG}); await IDB.set('kv','meta',{...META}); } catch(e){}
+  }, 150);
+  pintarSync();
+  if (huboCambio) programarSync(2500);
+}
+async function cargarDB(){
+  try {
+    const m = await IDB.get('kv','meta'); if (m) Object.assign(META, m);
+    const e = await IDB.get('kv','estado');
+    if (e && e.DB){ DB = normalizar(e.DB); CFG = e.CFG; }
+  } catch(e){}
+  if (!DB){ // migración desde la versión anterior (localStorage)
+    try { const raw = localStorage.getItem(LS); if (raw){ const o = JSON.parse(raw); DB = normalizar(o.DB); CFG = o.CFG; } } catch(e){}
+  }
+  if (!DB){ DB = META.gh ? vacia() : normalizar(semilla()); }
+  CFG = CFG || {moneda:'Q', tema:'auto', gramosAveDia:110};
+  if (META.rol && ROLES[META.rol]) S.rol = META.rol;
+}
+
+// ---------- Borrar con lápida ----------
+function borrarRegistro(col, id){
+  DB[col] = DB[col].filter(r=>r.id!==id);
+  (DB._borrados[col] ||= {})[id] = ahora();
+}
+
+// ---------- Fusión registro por registro (gana el cambio más reciente) ----------
+function fusionar(a, b){
+  a = normalizar(a); b = normalizar(b);
+  const out = {_borrados:{}};
+  const cols = new Set([...Object.keys(a), ...Object.keys(b)].filter(k=>k!=='_borrados' && Array.isArray(a[k]??b[k])));
+  cols.forEach(c=>{
+    const lap = {...(b._borrados[c]||{})};
+    Object.entries(a._borrados[c]||{}).forEach(([id,t])=>{ if(!(lap[id]>=t)) lap[id]=t; });
+    if (Object.keys(lap).length) out._borrados[c] = lap;
+    const m = new Map();
+    (b[c]||[]).forEach(r=>m.set(r.id, r));                            // remoto primero
+    (a[c]||[]).forEach(r=>{ const o = m.get(r.id); if (!o || (r._mod||0) > (o._mod||0)) m.set(r.id, r); });
+    out[c] = [...m.values()].filter(r => !(lap[r.id] >= (r._mod||0))).sort((x,y)=>String(x.id).localeCompare(String(y.id)));
+  });
+  return out;
+}
+
+// ---------- Base64 seguro para UTF-8 y binarios ----------
+function b64DeBytes(u8){ let s=''; for (let i=0;i<u8.length;i+=0x8000) s+=String.fromCharCode.apply(null, u8.subarray(i,i+0x8000)); return btoa(s); }
+const b64DeTexto = t => b64DeBytes(new TextEncoder().encode(t));
+const textoDeB64 = b => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g,'')), c=>c.charCodeAt(0)));
+
+// ---------- Cliente mínimo de la API de GitHub ----------
+class ErrorGH extends Error { constructor(msg, status){ super(msg); this.status = status; } }
+async function gh(ruta, opts = {}, crudo = false){
+  const g = META.gh; if (!g) throw new ErrorGH('Sin configurar', 0);
+  let r;
+  try {
+    r = await fetch(`https://api.github.com/repos/${encodeURIComponent(g.owner)}/${encodeURIComponent(g.repo)}${ruta}`, {
+      ...opts, cache:'no-store',
+      headers:{ 'Authorization':`Bearer ${g.token}`, 'Accept': crudo ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28', ...(opts.body?{'Content-Type':'application/json'}:{}) },
+    });
+  } catch(e){ throw new ErrorGH('Sin conexión con GitHub', 0); }
+  if (!r.ok){
+    let msg = `GitHub respondió ${r.status}`;
+    if (r.status===401) msg = 'El token no es válido o venció';
+    else if (r.status===403) msg = 'El token no tiene permiso de escritura (Contents: Read and write)';
+    else if (r.status===404) msg = 'No se encontró el repositorio o el archivo';
+    else if (r.status===409 || r.status===422) msg = 'conflicto';
+    throw new ErrorGH(msg, r.status);
+  }
+  return crudo ? r : r.json();
+}
+const ramaQ = () => `?ref=${encodeURIComponent(META.gh.rama||'main')}`;
+
+async function leerDatos(){
+  let j;
+  try { j = await gh(`/contents/datos.json${ramaQ()}`); }
+  catch(e){ if (e.status===404) return null; throw e; }
+  let txt;
+  if (j.content && j.encoding==='base64') txt = textoDeB64(j.content);
+  else { const b = await gh(`/git/blobs/${j.sha}`); txt = textoDeB64(b.content); }   // archivos > 1 MB
+  return { datos: normalizar(JSON.parse(txt)), sha: j.sha };
+}
+async function escribirDatos(datos, sha){
+  const cuerpo = { message:`Sincronización · ${META.gh.dispositivo||'dispositivo'} · ${new Date().toLocaleString('es-CR')}`,
+    content: b64DeTexto(JSON.stringify(datos)), branch: META.gh.rama||'main', ...(sha?{sha}:{}) };
+  const r = await gh('/contents/datos.json', {method:'PUT', body:JSON.stringify(cuerpo)});
+  return r.content.sha;
+}
+async function subirFotoGH(ruta, blob){
+  const u8 = new Uint8Array(await blob.arrayBuffer());
+  try {
+    await gh(`/contents/${ruta}`, {method:'PUT', body:JSON.stringify({ message:`Foto · ${ruta}`, content:b64DeBytes(u8), branch:META.gh.rama||'main' })});
+  } catch(e){ if (e.status===422 || e.status===409) return; throw e; }   // ya existía: listo
+}
+async function bajarFotoGH(ruta){
+  const r = await gh(`/contents/${ruta}${ramaQ()}`, {}, true);
+  return await r.blob();
+}
+
+// ---------- Fotos: guardadas en el teléfono y subidas cuando hay internet ----------
+const urlsFoto = new Map();
+const FOTO_VACIA = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+function fotoTag(src, alt=''){
+  if (!src) return '';
+  if (src.startsWith('gh:')) return `<img data-foto-src="${esc(src)}" src="${urlsFoto.get(src)||FOTO_VACIA}" alt="${esc(alt)}">`;
+  return `<img src="${esc(src)}" alt="${esc(alt)}">`;
+}
+async function hidratarFotos(raiz = document){
+  const imgs = [...raiz.querySelectorAll('img[data-foto-src]')];
+  for (const img of imgs){
+    const src = img.dataset.fotoSrc; if (urlsFoto.has(src)){ img.src = urlsFoto.get(src); continue; }
+    const ruta = src.slice(3);
+    try {
+      let reg = await IDB.get('fotos', ruta);
+      if (!reg && META.gh && navigator.onLine){ const blob = await bajarFotoGH(ruta); reg = {blob, pendiente:false}; await IDB.set('fotos', ruta, reg); }
+      if (reg){ const u = URL.createObjectURL(reg.blob); urlsFoto.set(src, u); document.querySelectorAll(`img[data-foto-src="${CSS.escape(src)}"]`).forEach(i=>i.src=u); }
+    } catch(e){ /* sin conexión: se intentará luego */ }
+  }
+}
+async function fotosPendientes(){
+  const ks = await IDB.keys('fotos'); const out = [];
+  for (const k of ks){ const r = await IDB.get('fotos', k); if (r?.pendiente) out.push([k, r]); }
+  return out;
+}
+
+// ---------- Motor de sincronización ----------
+const SYNC = { estado:'local', error:'', corriendo:false, otra:false, pendFotos:0 };
+let tSync = null;
+function programarSync(ms){ if (!META.gh) return; clearTimeout(tSync); tSync = setTimeout(()=>sincronizar(), ms); }
+
+async function sincronizar({silencioso=true} = {}){
+  if (!META.gh){ SYNC.estado='local'; pintarSync(); return; }
+  if (!navigator.onLine){ SYNC.estado='offline'; pintarSync(); return; }
+  if (SYNC.corriendo){ SYNC.otra = true; return; }
+  SYNC.corriendo = true; SYNC.estado = 'sincronizando'; SYNC.error=''; pintarSync();
+  const antes = JSON.stringify(DB);
+  try {
+    // 1) Fotos que se tomaron sin internet
+    for (const [ruta, reg] of await fotosPendientes()){
+      await subirFotoGH(ruta, reg.blob); reg.pendiente = false; await IDB.set('fotos', ruta, reg);
+    }
+    // 2) Datos: leer → fusionar → escribir (reintenta si otro dispositivo escribió antes)
+    for (let intento = 0; intento < 4; intento++){
+      const v = META.cambios;
+      const remoto = await leerDatos();
+      const fusion = remoto ? fusionar(DB, remoto.datos) : fusionar(DB, vacia());
+      const hayQueSubir = !remoto || META.sucio || JSON.stringify(fusion) !== JSON.stringify(remoto.datos);
+      if (!hayQueSubir){ DB = fusionar(DB, fusion); META.sha = remoto.sha; break; }
+      try {
+        META.sha = await escribirDatos(fusion, remoto?.sha);
+        DB = fusionar(DB, fusion);
+        META.sucio = META.cambios !== v;     // si editaste mientras subía, queda pendiente
+        break;
+      } catch(e){ if (e.message!=='conflicto' || intento===3) throw e; }
+    }
+    META.ultima = ahora(); SYNC.estado = 'ok';
+  } catch(e){
+    SYNC.estado = navigator.onLine ? 'error' : 'offline'; SYNC.error = e.message;
+    if (!silencioso) snack(e.message, true);
+  } finally {
+    SYNC.corriendo = false;
+    SYNC.pendFotos = (await fotosPendientes()).length;
+    guardarDB(false);
+    if (JSON.stringify(DB) !== antes && !FORM) render();       // llegaron cambios de otro dispositivo
+    pintarSync();
+    if (SYNC.otra){ SYNC.otra = false; programarSync(500); }
+  }
+}
+
+// Indicador en el encabezado
+function textoSync(){
+  if (!META.gh) return {i:'💾', t:'Solo este equipo', c:''};
+  const pend = (META.sucio?1:0) + SYNC.pendFotos;
+  if (SYNC.estado==='sincronizando') return {i:'⟳', t:'Sincronizando…', c:'gira'};
+  if (!navigator.onLine || SYNC.estado==='offline') return {i:'☁︎', t: pend ? 'Sin señal · cambios guardados' : 'Sin señal', c:'off'};
+  if (SYNC.estado==='error') return {i:'!', t:'Error al sincronizar', c:'err'};
+  if (pend) return {i:'↑', t:'Cambios por subir', c:'pend'};
+  return {i:'✓', t: META.ultima ? `Al día · ${hace(META.ultima)}` : 'Al día', c:'ok'};
+}
+function hace(t){ const s = Math.round((ahora()-t)/1000); if (s<60) return 'ahora'; const m=Math.round(s/60); if (m<60) return `hace ${m} min`; const h=Math.round(m/60); return h<24?`hace ${h} h`:`hace ${Math.round(h/24)} d`; }
+function pintarSync(){
+  const x = textoSync();
+  document.querySelectorAll('.syncpill').forEach(el=>{ el.className = `syncpill ${x.c}`; el.innerHTML = `<span class="si">${x.i}</span><span class="tx">${esc(x.t)}</span>`; el.title = x.t; });
+}
+window.addEventListener('online', ()=>{ pintarSync(); programarSync(800); });
+window.addEventListener('offline', ()=>{ SYNC.estado='offline'; pintarSync(); });
+document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState==='visible') programarSync(500); });
+setInterval(()=>{ if (META.gh && document.visibilityState==='visible') sincronizar(); else pintarSync(); }, 3*60*1000);
+
+// ---------- Conectar este dispositivo ----------
+async function conectarGitHub(cfg){
+  const previo = META.gh; META.gh = cfg;
+  try { await gh(''); }                                   // ¿existe el repo y sirve el token?
+  catch(e){ META.gh = previo; throw e; }
+  const remoto = await leerDatos().catch(e=>{ META.gh = previo; throw e; });
+  return remoto;
+}
+
+function semilla(){
+  const H = hoy();
+  const galpones = [
+    {id:'g1', nombre:'Galpón A', raza:'Lohmann Brown', aves:482, avesIniciales:500, fechaIngreso:sumarDias(H,-210)},
+    {id:'g2', nombre:'Galpón B', raza:'Hy-Line W-36', aves:351, avesIniciales:360, fechaIngreso:sumarDias(H,-150)},
+    {id:'g3', nombre:'Galpón C', raza:'Isa Brown', aves:226, avesIniciales:240, fechaIngreso:sumarDias(H,-95)},
+  ];
+  const huevos = [];
+  for (let d = 59; d >= 0; d--) galpones.forEach(g => {
+    huevos.push({id:uid(), fecha:sumarDias(H,-d), galponId:g.id, cantidad: Math.round(g.aves * (0.80 + Math.random()*0.1))});
+  });
+  const causas = ['Enfermedad','Depredador','Calor','Accidente','Otra'];
+  const perdidas = Array.from({length:12}, (_,i) => ({id:uid(), fecha:sumarDias(H,-rnd(0,58)), galponId:galpones[i%3].id, cantidad:rnd(1,5), causa:causas[rnd(0,4)], notas:''}));
+  const potreros = [
+    {id:'p1', especie:'Vaca', nombre:'Potrero La Ceiba', hectareas:4.5, pasto:'Brachiaria', estado:'En uso'},
+    {id:'p2', especie:'Vaca', nombre:'Potrero El Río', hectareas:3.2, pasto:'Estrella', estado:'Descanso'},
+    {id:'p3', especie:'Vaca', nombre:'Potrero Norte', hectareas:5.0, pasto:'Brachiaria', estado:'En uso'},
+    {id:'p4', especie:'Oveja', nombre:'Corral Ovino 1', hectareas:1.2, pasto:'Kikuyo', estado:'En uso'},
+    {id:'p5', especie:'Oveja', nombre:'Corral Ovino 2', hectareas:0.9, pasto:'Kikuyo', estado:'Descanso'},
+  ];
+  const a = (o) => ({id:uid(), foto:'', madre:'', padre:'', servicio:'', ...o});
+  const animales = [
+    a({codigo:'V-001', nombre:'Canela', especie:'Vaca', sexo:'Hembra', raza:'Jersey', nacimiento:sumarDias(H,-2400), pesoKg:410, potreroId:'p1', estado:'Lactando'}),
+    a({codigo:'V-002', nombre:'Luna', especie:'Vaca', sexo:'Hembra', raza:'Holstein', nacimiento:sumarDias(H,-2100), pesoKg:560, potreroId:'p1', estado:'Preñada', servicio:sumarDias(H,-262)}),
+    a({codigo:'V-003', nombre:'Tormenta', especie:'Vaca', sexo:'Macho', raza:'Brahman', nacimiento:sumarDias(H,-1900), pesoKg:780, potreroId:'p3', estado:'Activo'}),
+    a({codigo:'V-004', nombre:'Mora', especie:'Vaca', sexo:'Hembra', raza:'Jersey', nacimiento:sumarDias(H,-900), pesoKg:330, potreroId:'p1', estado:'Preñada', madre:'V-001', padre:'V-003', servicio:sumarDias(H,-120)}),
+    a({codigo:'V-005', nombre:'Paloma', especie:'Vaca', sexo:'Hembra', raza:'Holstein', nacimiento:sumarDias(H,-1500), pesoKg:520, potreroId:'p3', estado:'Lactando', madre:'V-002'}),
+    a({codigo:'V-006', nombre:'Toro Chico', especie:'Vaca', sexo:'Macho', raza:'Brahman', nacimiento:sumarDias(H,-240), pesoKg:190, potreroId:'p2', estado:'Activo', madre:'V-002', padre:'V-003'}),
+    a({codigo:'V-007', nombre:'Estrella', especie:'Vaca', sexo:'Hembra', raza:'Gyr', nacimiento:sumarDias(H,-1700), pesoKg:470, potreroId:'p3', estado:'Seco'}),
+    a({codigo:'V-008', nombre:'Nube', especie:'Vaca', sexo:'Hembra', raza:'Jersey', nacimiento:sumarDias(H,-60), pesoKg:42, potreroId:'p1', estado:'Activo', madre:'V-001', padre:'V-003'}),
+    a({codigo:'O-001', nombre:'Copito', especie:'Oveja', sexo:'Hembra', raza:'Pelibuey', nacimiento:sumarDias(H,-1300), pesoKg:48, potreroId:'p4', estado:'Preñada', servicio:sumarDias(H,-138)}),
+    a({codigo:'O-002', nombre:'Algodón', especie:'Oveja', sexo:'Hembra', raza:'Katahdin', nacimiento:sumarDias(H,-1100), pesoKg:52, potreroId:'p4', estado:'Activo'}),
+    a({codigo:'O-003', nombre:'Bruno', especie:'Oveja', sexo:'Macho', raza:'Dorper', nacimiento:sumarDias(H,-1000), pesoKg:85, potreroId:'p5', estado:'Activo'}),
+    a({codigo:'O-004', nombre:'Nieve', especie:'Oveja', sexo:'Hembra', raza:'Pelibuey', nacimiento:sumarDias(H,-400), pesoKg:36, potreroId:'p4', estado:'Preñada', madre:'O-001', padre:'O-003', servicio:sumarDias(H,-40)}),
+    a({codigo:'O-005', nombre:'Pompón', especie:'Oveja', sexo:'Macho', raza:'Dorper', nacimiento:sumarDias(H,-90), pesoKg:18, potreroId:'p4', estado:'Activo', madre:'O-002', padre:'O-003'}),
+    a({codigo:'O-006', nombre:'Lana', especie:'Oveja', sexo:'Hembra', raza:'Katahdin', nacimiento:sumarDias(H,-800), pesoKg:44, potreroId:'p5', estado:'Activo'}),
+  ];
+  const tratamientos = [
+    {id:uid(), especie:'Vaca', animal:'V-001', tipo:'Antibiótico', producto:'Oxitetraciclina', fecha:sumarDias(H,-2), proxima:'', diasLeche:5, diasCarne:28},
+    {id:uid(), especie:'Vaca', animal:'Todo el hato', tipo:'Vacuna', producto:'Fiebre carbonosa', fecha:sumarDias(H,-175), proxima:sumarDias(H,5), diasLeche:0, diasCarne:0},
+    {id:uid(), especie:'Vaca', animal:'V-006', tipo:'Desparasitante', producto:'Ivermectina 1%', fecha:sumarDias(H,-92), proxima:sumarDias(H,-2), diasLeche:0, diasCarne:35},
+    {id:uid(), especie:'Vaca', animal:'V-002', tipo:'Vitamina', producto:'ADE', fecha:sumarDias(H,-20), proxima:sumarDias(H,40), diasLeche:0, diasCarne:0},
+    {id:uid(), especie:'Oveja', animal:'Todo el hato', tipo:'Desparasitante', producto:'Albendazol', fecha:sumarDias(H,-85), proxima:sumarDias(H,3), diasLeche:0, diasCarne:14},
+    {id:uid(), especie:'Oveja', animal:'O-003', tipo:'Vacuna', producto:'Clostridiales', fecha:sumarDias(H,-30), proxima:sumarDias(H,150), diasLeche:0, diasCarne:0},
+    {id:uid(), especie:'Gallina', animal:'Galpón A', tipo:'Vacuna', producto:'Newcastle', fecha:sumarDias(H,-80), proxima:sumarDias(H,10), diasLeche:0, diasCarne:0},
+  ];
+  const enfermedades = [
+    {id:uid(), especie:'Gallina', nombre:'Coriza infecciosa', sintomas:'Secreción nasal, ojos hinchados', tratamiento:'Sulfas en el agua 5 días; aislar aves', fecha:sumarDias(H,-40)},
+    {id:uid(), especie:'Gallina', nombre:'Piojillo', sintomas:'Plumas opacas, baja postura', tratamiento:'Polvo antiparasitario y limpieza de nidos', fecha:sumarDias(H,-12)},
+    {id:uid(), especie:'Vaca', nombre:'Mastitis', sintomas:'Ubre inflamada, grumos en la leche', tratamiento:'Antibiótico intramamario; respetar retiro', fecha:sumarDias(H,-2)},
+    {id:uid(), especie:'Vaca', nombre:'Garrapatas', sintomas:'Pérdida de peso, anemia', tratamiento:'Baño garrapaticida cada 21 días', fecha:sumarDias(H,-25)},
+    {id:uid(), especie:'Oveja', nombre:'Pietín', sintomas:'Cojera, mal olor en pezuñas', tratamiento:'Recorte de pezuñas y pediluvio', fecha:sumarDias(H,-18)},
+  ];
+  const stock = [
+    {id:uid(), area:'Gallina', producto:'Concentrado ponedora', cantidad:620, unidad:'kg', minimo:400},
+    {id:uid(), area:'Gallina', producto:'Cartones vacíos', cantidad:180, unidad:'unid.', minimo:200},
+    {id:uid(), area:'Gallina', producto:'Vitaminas aves', cantidad:3, unidad:'frascos', minimo:2},
+    {id:uid(), area:'Vaca', producto:'Sal mineral', cantidad:45, unidad:'kg', minimo:25},
+    {id:uid(), area:'Vaca', producto:'Melaza', cantidad:8, unidad:'galones', minimo:10},
+    {id:uid(), area:'Vaca', producto:'Ivermectina 1%', cantidad:2, unidad:'frascos', minimo:1},
+    {id:uid(), area:'Oveja', producto:'Concentrado ovino', cantidad:90, unidad:'kg', minimo:50},
+    {id:uid(), area:'Oveja', producto:'Albendazol', cantidad:1, unidad:'frascos', minimo:1},
+  ];
+  const compradores = [
+    {id:'c1', nombre:'Pulpería La Esquina', tipo:'Tienda', telefono:'8812-3344', direccion:'Barrio San Martín'},
+    {id:'c2', nombre:'Soda Doña Rosa', tipo:'Restaurante', telefono:'8701-2299', direccion:'Frente al parque'},
+    {id:'c3', nombre:'Supermercado El Ahorro', tipo:'Mayorista', telefono:'2710-5500', direccion:'Centro'},
+    {id:'c4', nombre:'María Fernández', tipo:'Particular', telefono:'8650-1122', direccion:'La Rita'},
+    {id:'c5', nombre:'Panadería Trigo de Oro', tipo:'Restaurante', telefono:'8899-0011', direccion:'Calle 3'},
+    {id:'c6', nombre:'Mini Súper Jiménez', tipo:'Tienda', telefono:'8433-7788', direccion:'Jiménez'},
+  ];
+  const pedidos = [];
+  for (let d = 50; d >= 0; d--){
+    const n = d % 3 === 0 ? 2 : 1;
+    for (let k = 0; k < n; k++){
+      const c = compradores[rnd(0,5)];
+      const estado = d <= 1 ? 'Pendiente' : (Math.random() < .07 ? 'Cancelado' : 'Entregado');
+      pedidos.push({id:uid(), compradorId:c.id, fecha:sumarDias(H,-d), cartones: c.tipo==='Mayorista' ? rnd(40,70) : rnd(10,30), precio: c.tipo==='Mayorista' ? 30 : 34, estado, notas:''});
+    }
+  }
+  const cats = ['Alimento','Medicinas','Mano de obra','Mantenimiento','Transporte','Otros'];
+  const gastos = [];
+  for (let i = 0; i < 20; i++){
+    const cat = i < 7 ? 'Alimento' : cats[rnd(0,5)];
+    gastos.push({id:uid(), fecha:sumarDias(H,-rnd(0,58)), area:['General','Gallina','Vaca','Oveja'][rnd(0,3)], categoria:cat, concepto: cat==='Alimento'?'Saco de concentrado':cat, monto: cat==='Alimento'? rnd(800,2200) : cat==='Mano de obra' ? rnd(1500,3000) : rnd(100,900)});
+  }
+  const usuarios = [
+    {id:uid(), nombre:'Andy', email:'andy@pecuaria.app', rol:'ADMIN', activo:'Sí'},
+    {id:uid(), nombre:'Carlos Mora', email:'carlos@pecuaria.app', rol:'GERENTE', activo:'Sí'},
+    {id:uid(), nombre:'José Vargas', email:'jose@pecuaria.app', rol:'OPERARIO', activo:'Sí'},
+    {id:uid(), nombre:'Dra. Elena Ruiz', email:'elena@pecuaria.app', rol:'VETERINARIO', activo:'Sí'},
+    {id:uid(), nombre:'Laura Solís', email:'laura@pecuaria.app', rol:'CONTADOR', activo:'No'},
+  ];
+  return {galpones, huevos, perdidas, potreros, animales, tratamientos, enfermedades, stock, compradores, pedidos, gastos, usuarios};
+}
+
+// ---------------- Cálculos (Calculos.kt) ----------------
+const C = {
+  totalAves: () => DB.galpones.reduce((s,g)=>s+Number(g.aves||0),0),
+  huevosDia: (f=hoy(), gid) => DB.huevos.filter(h=>h.fecha===f && (!gid||h.galponId===gid)).reduce((s,h)=>s+Number(h.cantidad||0),0),
+  postura: (f=hoy()) => { const a = C.totalAves(); return a ? C.huevosDia(f)*100/a : 0; },
+  totalHuevos: () => DB.huevos.reduce((s,h)=>s+Number(h.cantidad||0),0),
+  comprometidos: (excluirId) => DB.pedidos.filter(p=>p.estado!=='Cancelado' && p.id!==excluirId).reduce((s,p)=>s+Number(p.cartones||0),0),
+  cartonesDisponibles: (excluirId) => Math.floor(C.totalHuevos()/HUEVOS_POR_CARTON) - C.comprometidos(excluirId),
+  cartones: h => [Math.floor(h/HUEVOS_POR_CARTON), h%HUEVOS_POR_CARTON],
+  mortalidad: g => g.avesIniciales ? (g.avesIniciales - g.aves)*100/g.avesIniciales : 0,
+  parto: (a) => { const e = ESP[espDeValor(a.especie)]; return a.servicio && e?.gest ? sumarDias(a.servicio, e.gest) : ''; },
+  retiro: (a) => { // devuelve fechas hasta las que la leche/carne no se puede vender
+    let leche='', carne='';
+    DB.tratamientos.filter(t => t.animal===a.codigo || (t.animal==='Todo el hato' && t.especie===a.especie)).forEach(t=>{
+      if (Number(t.diasLeche)>0){ const f = sumarDias(t.fecha, Number(t.diasLeche)); if (f>=hoy() && f>leche) leche=f; }
+      if (Number(t.diasCarne)>0){ const f = sumarDias(t.fecha, Number(t.diasCarne)); if (f>=hoy() && f>carne) carne=f; }
+    });
+    return {leche, carne};
+  },
+  diasAlimento: () => { const kg = DB.stock.filter(s=>s.area==='Gallina' && /concentrado/i.test(s.producto)).reduce((s,x)=>s+Number(x.cantidad||0),0);
+    const aves = C.totalAves(); return aves ? Math.floor(kg*1000/(aves*CFG.gramosAveDia)) : 0; },
+  totalPedido: p => Number(p.cartones||0)*Number(p.precio||0),
+};
+const nombreGalpon = id => DB.galpones.find(g=>g.id===id)?.nombre || '—';
+const nombreComprador = id => DB.compradores.find(c=>c.id===id)?.nombre || '—';
+const nombrePotrero = id => DB.potreros.find(p=>p.id===id)?.nombre || '—';
+const animalPorCodigo = c => DB.animales.find(a=>a.codigo===c);
+
+// ---------------- Entidades (equivale a PantallaCRUD + DialogoFormulario) ----------------
+const estadoBadge = e => ({Pendiente:'warn', Entregado:'ok', Cancelado:'bad', Preñada:'info', Lactando:'ok', Seco:'', Activo:'', Vendido:'bad', Muerto:'bad', 'En uso':'ok', Descanso:'warn'}[e] ?? '');
+const ENT = {
+  galpones:{ titulo:'Galpones', uno:'galpón', emo:'🏠', detalle:'galpon',
+    campos:()=>[{k:'nombre',l:'Nombre',req:1},{k:'raza',l:'Raza / línea genética'},{k:'aves',l:'Aves actuales',t:'number',req:1},{k:'avesIniciales',l:'Aves al ingresar',t:'number'},{k:'fechaIngreso',l:'Fecha de ingreso',t:'date'}],
+    item:g=>({t1:g.nombre, t2:`${g.raza||'Sin raza'} · ${num(g.aves)} aves`, rt:`<b>${num(C.huevosDia(hoy(),g.id))}</b><span class="muted">huevos hoy</span>`}),
+    resumen:l=>[{l:'Galpones',v:l.length},{l:'Aves totales',v:num(l.reduce((s,g)=>s+Number(g.aves),0))}] },
+  huevos:{ titulo:'Recolección de huevos', uno:'registro', emo:'🥚',
+    campos:()=>[{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'galponId',l:'Galpón',t:'select',req:1,op:DB.galpones.map(g=>[g.id,g.nombre])},{k:'cantidad',l:'Cantidad de huevos',t:'number',req:1,hint:`${HUEVOS_POR_CARTON} huevos = 1 cartón`}],
+    item:h=>{const [c,r]=C.cartones(Number(h.cantidad)); return {t1:`${num(h.cantidad)} huevos`, t2:`${nombreGalpon(h.galponId)} · ${fFecha(h.fecha)}`, rt:`<span class="badge info">${c} cartones${r?` + ${r}`:''}</span>`};},
+    resumen:l=>[{l:'Huevos hoy',v:num(C.huevosDia())},{l:'% postura hoy',v:C.postura().toFixed(1)+'%'},{l:'Cartones disp.',v:num(C.cartonesDisponibles())}] },
+  perdidas:{ titulo:'Pérdidas de aves', uno:'pérdida', emo:'⚠️',
+    campos:()=>[{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'galponId',l:'Galpón',t:'select',req:1,op:DB.galpones.map(g=>[g.id,g.nombre])},{k:'cantidad',l:'Aves perdidas',t:'number',req:1},{k:'causa',l:'Causa',t:'select',op:['Enfermedad','Depredador','Calor','Accidente','Otra']},{k:'notas',l:'Notas',t:'area'}],
+    item:p=>({t1:`${p.cantidad} ${p.cantidad==1?'ave':'aves'} · ${p.causa}`, t2:`${nombreGalpon(p.galponId)} · ${fFecha(p.fecha)}`}),
+    resumen:l=>{const m=l.filter(p=>diasEntre(p.fecha,hoy())<=30).reduce((s,p)=>s+Number(p.cantidad),0); return [{l:'Últimos 30 días',v:m},{l:'Registros',v:l.length}];},
+    onSave:(nuevo, viejo)=>{ // descuenta del galpón, como haría una transacción
+      const g = DB.galpones.find(x=>x.id===nuevo.galponId); if(!g) return;
+      const delta = Number(nuevo.cantidad) - (viejo && viejo.galponId===nuevo.galponId ? Number(viejo.cantidad) : 0);
+      if (viejo && viejo.galponId!==nuevo.galponId){ const gv = DB.galpones.find(x=>x.id===viejo.galponId); if(gv){ gv.aves = Number(gv.aves)+Number(viejo.cantidad); toca(gv); } }
+      g.aves = Math.max(0, Number(g.aves) - delta); toca(g); } },
+  animales:{ titulo:'Animales', uno:'animal', ctx:'especie', detalle:'animal',
+    chips:{k:'estado', v:['Activo','Preñada','Lactando','Seco','Vendido']},
+    campos:(cx)=>[{k:'codigo',l:'Código / arete',req:1,unico:1},{k:'nombre',l:'Nombre'},{k:'sexo',l:'Sexo',t:'select',req:1,op:['Hembra','Macho']},{k:'raza',l:'Raza'},{k:'nacimiento',l:'Fecha de nacimiento',t:'date'},{k:'pesoKg',l:'Peso (kg)',t:'number'},
+      {k:'potreroId',l:cx.especie==='Oveja'?'Corral / potrero':'Potrero',t:'select',op:[['','Sin asignar'],...DB.potreros.filter(p=>p.especie===cx.especie).map(p=>[p.id,p.nombre])]},
+      {k:'estado',l:'Estado',t:'select',op:['Activo','Preñada','Lactando','Seco','Vendido','Muerto']},
+      {k:'servicio',l:'Fecha de servicio / monta',t:'date',hint:'Con esta fecha se calcula el parto probable'},
+      {k:'madre',l:'Código de la madre',t:'select',op:[['','Desconocida'],...DB.animales.filter(a=>a.especie===cx.especie&&a.sexo==='Hembra').map(a=>[a.codigo,`${a.codigo} · ${a.nombre}`])]},
+      {k:'padre',l:'Código del padre',t:'select',op:[['','Desconocido'],...DB.animales.filter(a=>a.especie===cx.especie&&a.sexo==='Macho').map(a=>[a.codigo,`${a.codigo} · ${a.nombre}`])]}],
+    item:a=>({av: a.foto?fotoTag(a.foto):ESP[espDeValor(a.especie)].emo, t1:`${a.nombre||'Sin nombre'} · ${a.codigo}`, t2:`${a.sexo} · ${a.raza||'—'} · ${edad(a.nacimiento)}`, rt:`<span class="badge ${estadoBadge(a.estado)}">${esc(a.estado)}</span>`}),
+    resumen:l=>[{l:'Total',v:l.length},{l:'Hembras',v:l.filter(a=>a.sexo==='Hembra').length},{l:'Preñadas',v:l.filter(a=>a.estado==='Preñada').length}] },
+  tratamientos:{ titulo:'Vacunas y tratamientos', uno:'tratamiento', emo:'💉', ctx:'especie',
+    chips:{k:'tipo', v:['Vacuna','Desparasitante','Antibiótico','Vitamina']},
+    campos:(cx)=>[{k:'animal',l:cx.especie==='Gallina'?'Galpón':'Animal',t:'select',req:1,op: cx.especie==='Gallina' ? ['Todos los galpones',...DB.galpones.map(g=>g.nombre)] : ['Todo el hato',...DB.animales.filter(a=>a.especie===cx.especie).map(a=>[a.codigo,`${a.codigo} · ${a.nombre}`])]},
+      {k:'tipo',l:'Tipo',t:'select',op:['Vacuna','Desparasitante','Antibiótico','Vitamina']},{k:'producto',l:'Producto',req:1},{k:'fecha',l:'Fecha de aplicación',t:'date',req:1,def:hoy()},{k:'proxima',l:'Próxima dosis',t:'date'},
+      ...(cx.especie==='Gallina'?[]:[{k:'diasLeche',l:'Días de retiro en leche',t:'number',hint:'Según la etiqueta del producto'},{k:'diasCarne',l:'Días de retiro en carne',t:'number'}])],
+    item:t=>{ const venc = t.proxima && t.proxima < hoy(); const pr = t.proxima && !venc && diasEntre(hoy(),t.proxima)<=7;
+      return {av:'💉', t1:`${t.producto}`, t2:`${t.tipo} · ${t.animal} · ${fFecha(t.fecha)}`, rt: t.proxima ? `<span class="badge ${venc?'bad':pr?'warn':''}">${venc?'Vencida':'Próx. '+fCorta(t.proxima)}</span>` : ''}; },
+    resumen:l=>[{l:'Próximos 7 días',v:l.filter(t=>t.proxima&&t.proxima>=hoy()&&diasEntre(hoy(),t.proxima)<=7).length},{l:'Vencidas',v:l.filter(t=>t.proxima&&t.proxima<hoy()).length}] },
+  potreros:{ titulo:'Potreros y corrales', uno:'potrero', emo:'🌾', ctx:'especie',
+    campos:()=>[{k:'nombre',l:'Nombre',req:1},{k:'hectareas',l:'Área (hectáreas)',t:'number'},{k:'pasto',l:'Tipo de pasto'},{k:'estado',l:'Estado',t:'select',op:['En uso','Descanso']}],
+    item:p=>{const n=DB.animales.filter(a=>a.potreroId===p.id).length; return {av:'🌾', t1:p.nombre, t2:`${p.hectareas||0} ha · ${p.pasto||'—'} · ${n} animales`, rt:`<span class="badge ${estadoBadge(p.estado)}">${esc(p.estado)}</span>`};},
+    resumen:l=>[{l:'Potreros',v:l.length},{l:'Hectáreas',v:l.reduce((s,p)=>s+Number(p.hectareas||0),0).toFixed(1)}] },
+  enfermedades:{ titulo:'Enfermedades', uno:'registro', emo:'🩺', ctx:'especie',
+    campos:()=>[{k:'nombre',l:'Enfermedad',req:1},{k:'fecha',l:'Fecha',t:'date',def:hoy()},{k:'sintomas',l:'Síntomas',t:'area'},{k:'tratamiento',l:'Tratamiento',t:'area'}],
+    item:e=>({av:'🩺', t1:e.nombre, t2:`${fFecha(e.fecha)} · ${e.sintomas||''}`}) },
+  stock:{ titulo:'Inventario', uno:'producto', emo:'📦', ctx:'area',
+    campos:()=>[{k:'producto',l:'Producto',req:1},{k:'cantidad',l:'Cantidad',t:'number',req:1},{k:'unidad',l:'Unidad',def:'unid.'},{k:'minimo',l:'Mínimo de alerta',t:'number',hint:'Avisa en Inicio cuando la cantidad llegue a este número'}],
+    item:s=>{const bajo=Number(s.cantidad)<=Number(s.minimo); return {av:'📦', t1:s.producto, t2:`Mínimo: ${num(s.minimo)} ${s.unidad}`, rt:`<b style="color:${bajo?'var(--danger)':'inherit'}">${num(s.cantidad)}</b><span class="muted">${esc(s.unidad)}</span>`};},
+    resumen:l=>[{l:'Productos',v:l.length},{l:'Bajo mínimo',v:l.filter(s=>Number(s.cantidad)<=Number(s.minimo)).length}] },
+  compradores:{ titulo:'Compradores', uno:'comprador', detalle:'comprador',
+    chips:{k:'tipo', v:['Tienda','Restaurante','Mayorista','Particular']},
+    campos:()=>[{k:'nombre',l:'Nombre o negocio',req:1},{k:'tipo',l:'Tipo',t:'select',op:['Tienda','Restaurante','Mayorista','Particular']},{k:'telefono',l:'Teléfono',t:'tel'},{k:'direccion',l:'Dirección'}],
+    item:c=>{const ps=DB.pedidos.filter(p=>p.compradorId===c.id&&p.estado!=='Cancelado'); return {av:esc(c.nombre[0]||'?'), t1:c.nombre, t2:`${c.tipo} · ${c.telefono||'Sin teléfono'}`, rt:`<b>${ps.length}</b><span class="muted">pedidos</span>`};},
+    resumen:l=>[{l:'Compradores',v:l.length}] },
+  pedidos:{ titulo:'Pedidos', uno:'pedido', detalle:'pedido',
+    chips:{k:'estado', v:['Pendiente','Entregado','Cancelado']},
+    campos:()=>[{k:'compradorId',l:'Comprador',t:'select',req:1,op:DB.compradores.map(c=>[c.id,c.nombre])},{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'cartones',l:'Cartones',t:'number',req:1,hint:'stock'},{k:'precio',l:'Precio por cartón',t:'number',req:1,def:34},{k:'estado',l:'Estado',t:'select',op:['Pendiente','Entregado','Cancelado'],def:'Pendiente'},{k:'notas',l:'Notas',t:'area'}],
+    item:p=>({av:'🧾', t1:nombreComprador(p.compradorId), t2:`${p.cartones} cartones · ${fFecha(p.fecha)}`, rt:`<b>${dineroCorto(C.totalPedido(p))}</b><span class="badge ${p.estado==='Pendiente'?'hot':estadoBadge(p.estado)}">${p.estado}</span>`}),
+    resumen:l=>[{l:'Pendientes',v:l.filter(p=>p.estado==='Pendiente').length},{l:'Cartones disp.',v:num(C.cartonesDisponibles())}],
+    validar:(d, viejo)=>{ // PedidosRepositorio: evita sobreventas
+      if (d.estado==='Cancelado') return '';
+      const disp = C.cartonesDisponibles(viejo?.id);
+      return Number(d.cartones) > disp ? `Solo hay ${num(disp)} cartones disponibles.` : ''; } },
+  gastos:{ titulo:'Gastos', uno:'gasto',
+    chips:{k:'categoria', v:['Alimento','Medicinas','Mano de obra','Mantenimiento','Transporte','Otros']},
+    campos:()=>[{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'area',l:'Área',t:'select',op:['General','Gallina','Vaca','Oveja']},{k:'categoria',l:'Categoría',t:'select',op:['Alimento','Medicinas','Mano de obra','Mantenimiento','Transporte','Otros']},{k:'concepto',l:'Concepto',req:1},{k:'monto',l:'Monto',t:'number',req:1}],
+    item:g=>({av:'💸', t1:g.concepto, t2:`${g.categoria} · ${g.area} · ${fFecha(g.fecha)}`, rt:`<b>${dineroCorto(g.monto)}</b>`}),
+    resumen:l=>[{l:'Este mes',v:dineroCorto(l.filter(g=>diasEntre(g.fecha,hoy())<=30).reduce((s,g)=>s+Number(g.monto),0))}] },
+  usuarios:{ titulo:'Usuarios', uno:'usuario',
+    chips:{k:'rol', v:Object.keys(ROLES)},
+    campos:()=>[{k:'nombre',l:'Nombre',req:1},{k:'email',l:'Correo',t:'email',req:1},{k:'rol',l:'Rol',t:'select',op:Object.entries(ROLES).map(([k,r])=>[k,r.etq])},{k:'activo',l:'Activo',t:'select',op:['Sí','No']}],
+    item:u=>({av:esc(u.nombre[0]), t1:u.nombre, t2:u.email, rt:`<span class="badge ${u.activo==='Sí'?'ok':'bad'}">${ROLES[u.rol]?.etq||u.rol}</span>`}) },
+};
+const COL = k => DB[k]; // nombre de colección = clave
+
+// ---------------- Estado de navegación ----------------
+const S = {rol:null, tab:'inicio', pila:[], q:'', chip:'', ventas:'pedidos', periodo:'semana', grafica:'huevos'};
+const actual = () => S.pila.length ? S.pila[S.pila.length-1] : {v:S.tab, p:{}};
+function ir(v, p={}){ S.pila.push({v,p}); S.q=''; S.chip=''; render(true); }
+function atras(){ S.pila.pop(); S.q=''; S.chip=''; render(true); }
+function tab(t){ S.tab=t; S.pila=[]; S.q=''; S.chip=''; render(true); }
+
+// ---------------- Pestañas visibles por rol ----------------
+function pestanas(){
+  return [
+    {k:'inicio', l:'Inicio', i:'home', ok:puede('INICIO')},
+    {k:'animales', l:'Animales', i:'paw', ok:puede('AVICOLA')||puede('GANADERIA')},
+    {k:'ventas', l:'Ventas', i:'cart', ok:puede('PEDIDOS')},
+    {k:'reportes', l:'Reportes', i:'chart', ok:puede('REPORTES')},
+    {k:'mas', l:'Más', i:'menu', ok:true},
+  ].filter(t=>t.ok);
+}
+
+// ---------------- Componentes de vista ----------------
+const statStrip = arr => `<div class="strip">${arr.map(s=>`<div class="stat anim-in ${s.ac?'accent':''}" ${s.ac?`style="--ac:${s.ac}"`:''}><div class="v">${s.v}</div><div class="l">${esc(s.l)}</div></div>`).join('')}</div>`;
+const vacio = (e, t, d) => `<div class="empty"><div class="e">${e}</div><b>${esc(t)}</b>${esc(d)}</div>`;
+function fila(entK, x, ac){
+  const it = ENT[entK].item(x);
+  return `<button class="row anim-in" ${ac?`style="--ac:${ac}"`:''} data-a="abrir" data-p="${jp({ent:entK,id:x.id})}">
+    <div class="av">${it.av ?? ENT[entK].emo ?? '•'}</div>
+    <div class="tx"><div class="t1">${esc(it.t1)}</div><div class="t2">${esc(it.t2)}</div></div>
+    ${it.rt?`<div class="rt">${it.rt}</div>`:''}</button>`;
+}
+
+// Gráfica de línea en SVG (equivalente a Canvas en Compose)
+function lineChart(pts, color, fmt=v=>num(Math.round(v))){
+  if (!pts.length) return vacio('📉','Sin datos','No hay registros para este período.');
+  const W=340,H=170,L=34,R=8,T=12,B=26;
+  const max = Math.max(...pts.map(p=>p.v), 1), min = 0;
+  const x = i => L + (pts.length===1 ? (W-L-R)/2 : i*(W-L-R)/(pts.length-1));
+  const y = v => T + (H-T-B)*(1-(v-min)/(max-min||1));
+  const line = pts.map((p,i)=>`${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const area = `${x(0)},${H-B} ${line} ${x(pts.length-1)},${H-B}`;
+  const paso = Math.ceil(pts.length/6);
+  const grid = [0,.5,1].map(f=>{const v=min+(max-min)*f; return `<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--outline)" stroke-dasharray="3 3"/><text class="axis" x="${L-6}" y="${y(v)+3}" text-anchor="end">${v>=1000?(v/1000).toFixed(1)+'k':Math.round(v)}</text>`;}).join('');
+  const labels = pts.map((p,i)=> (i%paso===0||i===pts.length-1) ? `<text class="axis" x="${x(i)}" y="${H-8}" text-anchor="middle">${esc(p.l)}</text>`:'').join('');
+  const ult = pts[pts.length-1];
+  return `<div class="chart"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfica de línea">${grid}
+    <polygon class="ar" points="${area}" fill="${color}" fill-opacity=".16"/>
+    <polyline class="ln" pathLength="1" points="${line}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle class="pt" cx="${x(pts.length-1)}" cy="${y(ult.v)}" r="6" fill="${color}" stroke="var(--surface)" stroke-width="2.5"/>${labels}</svg>
+    <div class="legend"><span>Último: <b>${fmt(ult.v)}</b></span><span>Máx: <b>${fmt(max)}</b></span><span>Prom: <b>${fmt(pts.reduce((s,p)=>s+p.v,0)/pts.length)}</b></span></div></div>`;
+}
+function barras(items, color, fmt=num){
+  if (!items.length) return vacio('📊','Sin datos','No hay registros para este período.');
+  const max = Math.max(...items.map(i=>i.v), 1);
+  return `<div class="bars" style="--ac:${color}">${items.map(i=>`<div class="bar"><div class="bl"><span>${esc(i.l)}</span><span>${fmt(i.v)}</span></div><div class="bt"><div class="bf" style="width:${(i.v*100/max).toFixed(1)}%"></div></div></div>`).join('')}</div>`;
+}
+const agrupar = (lista, kf, vf) => { const m={}; lista.forEach(x=>{ const k=kf(x); m[k]=(m[k]||0)+vf(x); }); return Object.entries(m).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v); };
+
+// ---------------- Alertas para Inicio ----------------
+function alertas(){
+  const out=[];
+  if (puede('GANADERIA')||puede('AVICOLA')){
+    DB.tratamientos.filter(t=>t.proxima && (t.proxima<hoy() || diasEntre(hoy(),t.proxima)<=7)).filter(t=> t.especie==='Gallina'?puede('AVICOLA'):puede('GANADERIA')).forEach(t=>{
+      const venc=t.proxima<hoy(); const e=espDeValor(t.especie);
+      out.push({cls:venc?'bad':'warn', i:'💉', t:`${venc?'Dosis vencida':'Dosis próxima'}: ${t.producto}`, d:`${ESP[e].nombre} · ${t.animal} · ${venc?'desde':'el'} ${fFecha(t.proxima)}`, go:{v:'lista',p:{ent:'tratamientos',esp:e}}});
+    });
+  }
+  if (puede('GANADERIA')){
+    DB.animales.filter(a=>a.estado==='Preñada'&&a.servicio).forEach(a=>{ const pt=C.parto(a); const d=diasEntre(hoy(),pt);
+      if (d<=30 && d>=-7) out.push({cls:'info', i:ESP[espDeValor(a.especie)].emo, t:`Parto probable: ${a.nombre} (${a.codigo})`, d: d>=0?`En ${d} días · ${fFecha(pt)}`:`Pasada la fecha por ${-d} días`, go:{v:'detalle',p:{ent:'animales',id:a.id}}}); });
+    DB.animales.filter(a=>a.sexo==='Hembra'&&C.retiro(a).leche).forEach(a=>{
+      out.push({cls:'bad', i:'🥛', t:`No vender leche de ${a.nombre} (${a.codigo})`, d:`Retiro hasta el ${fFecha(C.retiro(a).leche)}`, go:{v:'detalle',p:{ent:'animales',id:a.id}}}); });
+  }
+  if (puede('STOCK')){
+    DB.stock.filter(s=>Number(s.cantidad)<=Number(s.minimo)).forEach(s=>{
+      out.push({cls:'warn', i:'📦', t:`Stock bajo: ${s.producto}`, d:`Quedan ${num(s.cantidad)} ${s.unidad} (${ESP[espDeValor(s.area)]?.nombre||s.area})`, go:{v:'lista',p:{ent:'stock',esp:espDeValor(s.area)}}}); });
+  }
+  return out;
+}
+
+// ======================= PANTALLAS =======================
+const V = {};
+
+V.inicio = () => {
+  const al = alertas();
+  const usuario = DB.usuarios.find(u=>u.rol===S.rol)?.nombre || ROLES[S.rol].etq;
+  const h = new Date().getHours(); const saludo = h<12?'Buenos días':h<19?'Buenas tardes':'Buenas noches';
+  let html = '';
+  const kpis = [];
+  const destacado = puede('AVICOLA') ? `<div class="stat feature anim-in"><div><div class="v">${num(C.huevosDia())}</div><div class="l">huevos recolectados hoy</div></div><div class="side"><b>${C.postura().toFixed(1)}%</b>de postura</div></div>` : '';
+  if (puede('AVICOLA')||puede('PEDIDOS')) kpis.push({l:'Cartones disponibles',v:num(C.cartonesDisponibles()),ac:'var(--c-venta)'});
+  if (puede('PEDIDOS')) kpis.push({l:'Pedidos pendientes',v:DB.pedidos.filter(p=>p.estado==='Pendiente').length,ac:'var(--c-venta)'});
+  if (puede('GANADERIA')) kpis.push({l:'Vacas',v:DB.animales.filter(a=>a.especie==='Vaca'&&!['Vendido','Muerto'].includes(a.estado)).length,ac:ESP.vacas.ac},{l:'Ovejas',v:DB.animales.filter(a=>a.especie==='Oveja'&&!['Vendido','Muerto'].includes(a.estado)).length,ac:ESP.ovejas.ac});
+  if (puede('REPORTES')){ const ing = DB.pedidos.filter(p=>p.estado==='Entregado'&&diasEntre(p.fecha,hoy())<=30).reduce((s,p)=>s+C.totalPedido(p),0); kpis.push({l:'Ingresos 30 días',v:dineroCorto(ing),ac:'var(--primary)'}); }
+  html += `<div class="grid2">${destacado}${kpis.map((s,i)=>`<div class="stat accent anim-in" style="--ac:${s.ac};${i===kpis.length-1&&kpis.length%2?'grid-column:1/-1':''}"><div class="v">${s.v}</div><div class="l">${esc(s.l)}</div></div>`).join('')}</div>`;
+
+  // Accesos rápidos según rol
+  const q=[];
+  if (puede('AVICOLA')) q.push({e:'🥚',l:'Registrar huevos',a:'nuevo',p:{ent:'huevos'}},{e:'⚠️',l:'Registrar pérdida',a:'nuevo',p:{ent:'perdidas'}});
+  if (puede('PEDIDOS')) q.push({e:'🧾',l:'Nuevo pedido',a:'nuevo',p:{ent:'pedidos'}});
+  if (puede('GANADERIA')) q.push({e:'💉',l:'Aplicar tratamiento',a:'go',p:{v:'elegirEspecie',p:{ent:'tratamientos'}}},{e:'🐄',l:'Nueva vaca',a:'nuevo',p:{ent:'animales',esp:'vacas'}},{e:'🐑',l:'Nueva oveja',a:'nuevo',p:{ent:'animales',esp:'ovejas'}});
+  if (puede('REPORTES')&&!puede('AVICOLA')) q.push({e:'💸',l:'Registrar gasto',a:'nuevo',p:{ent:'gastos'}});
+  if (q.length) html += `<div class="section-title">Acciones rápidas</div><div class="quick">${q.slice(0,6).map(x=>`<button class="anim-in" data-a="${x.a}" data-p="${jp(x.p)}"><span>${x.e}</span>${esc(x.l)}</button>`).join('')}</div>`;
+
+  html += `<div class="section-title">Pendientes y alertas <small>${al.length} en total</small></div>`;
+  html += al.length ? al.map(a=>`<button class="alert anim-in ${a.cls}" data-a="go" data-p="${jp(a.go)}"><div class="ai">${a.i}</div><div><b>${esc(a.t)}</b><span>${esc(a.d)}</span></div></button>`).join('')
+    : `<div class="card pad muted" style="text-align:center">✅ Todo al día. No hay alertas.</div>`;
+
+  if (puede('AVICOLA')){
+    const pts = Array.from({length:7},(_,i)=>{const f=sumarDias(hoy(),i-6); return {l:fCorta(f), v:C.huevosDia(f)};});
+    html += `<div class="section-title">Producción de huevos · 7 días</div><div class="card pad">${lineChart(pts,'var(--c-gallina)')}</div>`;
+  }
+  return {titulo:'Inicio', hero:{kicker:fFecha(hoy()), titulo:`${saludo},<br><em>${esc(usuario.split(' ')[0])}</em>`, escena:'campo'}, body:html};
+};
+
+V.animales = () => {
+  const vivos = e => DB.animales.filter(a=>a.especie===ESP[e].valor && !['Vendido','Muerto'].includes(a.estado));
+  const cards = [];
+  if (puede('AVICOLA')) cards.push({k:'gallinas', m:`${DB.galpones.length} galpones · ${num(C.huevosDia())} huevos hoy`, big:num(C.totalAves()), bs:'aves'});
+  if (puede('GANADERIA')){
+    const vs=vivos('vacas'), os=vivos('ovejas');
+    cards.push({k:'vacas', m:`${vs.filter(a=>a.estado==='Preñada').length} preñadas · ${vs.filter(a=>a.estado==='Lactando').length} en lactancia`, big:vs.length, bs:'cabezas'});
+    cards.push({k:'ovejas', m:`${os.filter(a=>a.estado==='Preñada').length} preñadas · ${os.filter(a=>a.sexo==='Macho').length} machos`, big:os.length, bs:'cabezas'});
+  }
+  const body = `<div class="hub">${cards.map(c=>`<button class="hubcard anim-in" style="--ac:${ESP[c.k].ac}" data-a="go" data-p="${jp({v:'especie',p:{esp:c.k}})}">
+    <div class="emo">${ESP[c.k].emo}</div><div><div class="t">${ESP[c.k].nombre}</div><div class="m">${c.m}</div></div><div class="big"><b>${c.big}</b><span>${c.bs}</span></div></button>`).join('')}</div>`;
+  return {titulo:'Animales', hero:{kicker:'Elige con quién vas a trabajar', titulo:'Tus <em>animales</em>', escena:'campo'}, body};
+};
+
+// Sub-hub de cada especie: tarjetas con métrica en vivo
+V.especie = ({esp}) => {
+  const E = ESP[esp]; let tiles=[], kpis=[];
+  if (esp==='gallinas'){
+    const perd30 = DB.perdidas.filter(p=>diasEntre(p.fecha,hoy())<=30).reduce((s,p)=>s+Number(p.cantidad),0);
+    kpis = [{l:'Aves',v:num(C.totalAves()),ac:E.ac},{l:'Huevos hoy',v:num(C.huevosDia()),ac:E.ac},{l:'% postura',v:C.postura().toFixed(1)+'%',ac:E.ac},{l:'Días de alimento',v:C.diasAlimento(),ac:E.ac}];
+    tiles = [
+      {e:'🏠',n:'Galpones',c:'Lotes y aves',cnt:DB.galpones.length,go:{v:'lista',p:{ent:'galpones'}}},
+      {e:'🥚',n:'Huevos',c:'Recolección diaria',cnt:num(C.huevosDia()),go:{v:'lista',p:{ent:'huevos'}}},
+      {e:'⚠️',n:'Pérdidas',c:'Últimos 30 días',cnt:perd30,go:{v:'lista',p:{ent:'perdidas'}}},
+      {e:'💉',n:'Vacunas',c:'Plan sanitario',cnt:DB.tratamientos.filter(t=>t.especie==='Gallina').length,go:{v:'lista',p:{ent:'tratamientos',esp}}},
+      {e:'🩺',n:'Enfermedades',c:'Notas y tratamientos',cnt:DB.enfermedades.filter(x=>x.especie==='Gallina').length,go:{v:'lista',p:{ent:'enfermedades',esp}},perm:'ENFERMEDADES'},
+      {e:'📦',n:'Inventario',c:'Alimento e insumos',cnt:DB.stock.filter(s=>s.area==='Gallina').length,go:{v:'lista',p:{ent:'stock',esp}},perm:'STOCK'},
+    ];
+  } else {
+    const l = DB.animales.filter(a=>a.especie===E.valor);
+    const vivos = l.filter(a=>!['Vendido','Muerto'].includes(a.estado));
+    const partos = vivos.filter(a=>a.estado==='Preñada'&&a.servicio);
+    const enRetiro = vivos.filter(a=>C.retiro(a).leche||C.retiro(a).carne).length;
+    kpis = [{l:'Cabezas',v:vivos.length,ac:E.ac},{l:'Hembras',v:vivos.filter(a=>a.sexo==='Hembra').length,ac:E.ac},{l:'Preñadas',v:partos.length,ac:E.ac},{l:'En retiro',v:enRetiro,ac:E.ac}];
+    const prox = partos.map(a=>diasEntre(hoy(),C.parto(a))).filter(d=>d>=0).sort((a,b)=>a-b)[0];
+    tiles = [
+      {e:E.emo,n:esp==='vacas'?'Hato':'Rebaño',c:'Fichas de cada animal',cnt:vivos.length,go:{v:'lista',p:{ent:'animales',esp}}},
+      {e:'🍼',n:'Reproducción',c:prox!==undefined?`Próximo parto en ${prox} días`:'Partos y servicios',cnt:partos.length,go:{v:'repro',p:{esp}}},
+      {e:'💉',n:'Sanidad',c:'Vacunas y tratamientos',cnt:DB.tratamientos.filter(t=>t.especie===E.valor).length,go:{v:'lista',p:{ent:'tratamientos',esp}}},
+      {e:'🌾',n:esp==='ovejas'?'Corrales':'Potreros',c:'Rotación de pastos',cnt:DB.potreros.filter(p=>p.especie===E.valor).length,go:{v:'lista',p:{ent:'potreros',esp}},perm:'POTREROS'},
+      {e:'🩺',n:'Enfermedades',c:'Notas y tratamientos',cnt:DB.enfermedades.filter(x=>x.especie===E.valor).length,go:{v:'lista',p:{ent:'enfermedades',esp}},perm:'ENFERMEDADES'},
+      {e:'📦',n:'Inventario',c:'Medicinas e insumos',cnt:DB.stock.filter(s=>s.area===E.valor).length,go:{v:'lista',p:{ent:'stock',esp}},perm:'STOCK'},
+    ];
+  }
+  tiles = tiles.filter(t=>!t.perm||puede(t.perm));
+  const body = statStrip(kpis) + `<div class="section-title">Secciones</div><div class="tiles" style="--ac:${E.ac}">${tiles.map(t=>`<button class="tile anim-in" data-a="go" data-p="${jp(t.go)}"><div class="ic">${t.e}</div><div><div class="n">${esc(t.n)}</div><div class="c">${esc(t.c)}</div></div><div class="cnt">${t.cnt}</div></button>`).join('')}</div>`;
+  return {titulo:E.nombre, hero:{kicker:'Panel de la especie', titulo:`${E.emo} ${E.nombre}`, escena:esp}, body, back:true, ac:E.ac};
+};
+
+V.elegirEspecie = ({ent}) => {
+  const ops = ['vacas','ovejas'].concat(puede('AVICOLA')?['gallinas']:[]);
+  return {titulo:'¿Para qué especie?', back:true, body:`<div class="hub">${ops.map(k=>`<button class="hubcard" style="--ac:${ESP[k].ac}" data-a="nuevoDesde" data-p="${jp({ent,esp:k})}"><div class="emo">${ESP[k].emo}</div><div class="t">${ESP[k].nombre}</div></button>`).join('')}</div>`};
+};
+
+// Listado genérico (PantallaCRUD) con búsqueda y filtros
+function itemsDe(p){
+  const E = ENT[p.ent]; let l = COL(p.ent).slice();
+  if (E.ctx && p.esp) l = l.filter(x => x[E.ctx] === ESP[p.esp].valor);
+  if (p.ent==='huevos'||p.ent==='perdidas'||p.ent==='pedidos'||p.ent==='gastos'||p.ent==='tratamientos'||p.ent==='enfermedades') l.sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  else if (p.ent==='animales') l.sort((a,b)=>a.codigo.localeCompare(b.codigo));
+  else l.sort((a,b)=>String(a.nombre||a.producto||'').localeCompare(String(b.nombre||b.producto||'')));
+  return l;
+}
+function filtrar(p, l){
+  const E = ENT[p.ent];
+  if (S.chip && E.chips) l = l.filter(x => x[E.chips.k] === S.chip);
+  const q = S.q.trim().toLowerCase();
+  if (q) l = l.filter(x => { const it = E.item(x); return (it.t1+' '+it.t2+' '+Object.values(x).join(' ')).toLowerCase().includes(q); });
+  return l;
+}
+function cuerpoLista(p){
+  const E = ENT[p.ent]; const todos = itemsDe(p); const l = filtrar(p, todos);
+  const ac = p.esp ? ESP[p.esp].ac : (p.ent==='pedidos'||p.ent==='compradores' ? 'var(--c-venta)' : '');
+  if (!l.length) return todos.length ? vacio('🔍','Sin resultados',`Ninguna coincidencia${S.q?` con “${S.q}”`:''}.`) : vacio(E.emo||'📋',`Aún no hay ${E.titulo.toLowerCase()}`,`Toca el botón + para agregar el primer ${E.uno}.`);
+  const lim = 80; const vis = l.slice(0, lim);
+  return `<div class="list">${vis.map(x=>fila(p.ent,x,ac)).join('')}</div>${l.length>lim?`<div class="note">Mostrando ${lim} de ${l.length}. Usa la búsqueda para encontrar el resto.</div>`:''}`;
+}
+function cabeceraLista(p){
+  const E = ENT[p.ent]; const todos = itemsDe(p);
+  let h = '';
+  if (E.resumen) h += statStrip(E.resumen(todos).map(s=>({...s, ac: p.esp?ESP[p.esp].ac:(['pedidos','compradores'].includes(p.ent)?'var(--c-venta)':'var(--primary)')})));
+  h += `<div class="search">${ic('search')}<input id="q" type="search" placeholder="Buscar ${E.titulo.toLowerCase()}…" value="${esc(S.q)}" autocomplete="off"></div>`;
+  if (E.chips){ const vals = E.chips.v.filter(v=>todos.some(x=>x[E.chips.k]===v));
+    if (vals.length>1) h += `<div class="chips"><button class="chip ${!S.chip?'on':''}" data-a="chip" data-p="${jp({v:''})}">Todos</button>${vals.map(v=>`<button class="chip ${S.chip===v?'on':''}" data-a="chip" data-p="${jp({v})}">${esc(ROLES[v]?.etq||v)}</button>`).join('')}</div>`; }
+  return h;
+}
+V.lista = (p) => {
+  const E = ENT[p.ent];
+  return {titulo: E.titulo + (p.esp && p.ent!=='animales' ? ` · ${ESP[p.esp].nombre}` : (p.ent==='animales'?` · ${ESP[p.esp].nombre}`:'')), back:true, ac:p.esp?ESP[p.esp].ac:'',
+    body: cabeceraLista(p) + `<div id="lista">${cuerpoLista(p)}</div>`, fab:{a:'nuevo', p}, lista:p, emo: p.esp ? ESP[p.esp].emo : (E.emo||'')};
+};
+
+V.ventas = () => {
+  const p = {ent:S.ventas};
+  const body = `<div class="seg"><button class="${S.ventas==='pedidos'?'on':''}" data-a="seg" data-p="${jp({v:'pedidos'})}">🧾 Pedidos</button><button class="${S.ventas==='compradores'?'on':''}" data-a="seg" data-p="${jp({v:'compradores'})}">👥 Compradores</button></div>`
+    + cabeceraLista(p) + `<div id="lista">${cuerpoLista(p)}</div>`;
+  return {titulo:'Ventas', hero:{kicker:'Pedidos de cartones y clientes', titulo:'<em>Ventas</em>', escena:'campo'}, body, fab:{a:'nuevo', p}, lista:p};
+};
+
+// Reproducción: partos probables según Calculos.kt
+V.repro = ({esp}) => {
+  const E = ESP[esp];
+  const hembras = DB.animales.filter(a=>a.especie===E.valor && a.sexo==='Hembra' && !['Vendido','Muerto'].includes(a.estado));
+  const pren = hembras.filter(a=>a.servicio && a.estado==='Preñada').map(a=>({a, pt:C.parto(a), d:diasEntre(hoy(),C.parto(a)), av:diasEntre(a.servicio,hoy())})).sort((x,y)=>x.d-y.d);
+  const vacias = hembras.filter(a=>a.estado!=='Preñada');
+  let body = statStrip([{l:'Preñadas',v:pren.length,ac:E.ac},{l:'Sin servicio',v:vacias.length,ac:E.ac},{l:'Gestación',v:`${E.gest} días`,ac:E.ac}]);
+  body += `<div class="section-title">Partos probables</div>`;
+  body += pren.length ? `<div class="list">${pren.map(x=>`<button class="row" style="--ac:${E.ac}" data-a="go" data-p="${jp({v:'detalle',p:{ent:'animales',id:x.a.id}})}">
+     <div class="av">${x.a.foto?fotoTag(x.a.foto):E.emo}</div>
+     <div class="tx"><div class="t1">${esc(x.a.nombre)} · ${esc(x.a.codigo)}</div><div class="t2">Parto: ${fFecha(x.pt)}</div>
+     <div class="steps"><div class="on" style="flex:${Math.min(x.av,E.gest)}"></div><div style="flex:${Math.max(E.gest-x.av,0)}"></div></div></div>
+     <div class="rt"><span class="badge ${x.d<=15?'warn':'info'}">${x.d>=0?`${x.d} días`:'Atrasado'}</span></div></button>`).join('')}</div>`
+    : vacio('🍼','Sin hembras preñadas','Registra la fecha de servicio en la ficha de cada animal.');
+  body += `<div class="section-title">Hembras sin servicio registrado</div><div class="list">${vacias.map(a=>fila('animales',a,E.ac)).join('') || '<div class="muted">Ninguna.</div>'}</div>`;
+  return {titulo:`Reproducción`, sub:E.nombre, emo:'🍼', back:true, body, ac:E.ac};
+};
+
+// --------- Fichas de detalle ---------
+V.detalle = ({ent, id}) => {
+  const E = ENT[ent]; const x = COL(ent).find(r=>r.id===id);
+  if (!x) return {titulo:'No encontrado', back:true, body:vacio('🤷','Este registro ya no existe','Puede que otra persona lo haya eliminado.')};
+  const acciones = `<div class="btnrow mt"><button class="btn tonal" data-a="editar" data-p="${jp({ent,id})}">${ic('edit')}Editar</button><button class="btn danger" data-a="eliminar" data-p="${jp({ent,id})}">${ic('del')}Eliminar</button></div>`;
+  if (E.detalle && D[E.detalle]) return D[E.detalle](x, acciones);
+  const camposCtx = E.campos({especie:x.especie||x.area});
+  const kv = camposCtx.map(c=>{ let v = x[c.k]; if (c.t==='date') v=fFecha(v); else if (c.t==='select'&&Array.isArray(c.op?.[0])) v=(c.op.find(o=>o[0]===v)||[])[1]||v;
+    return `<div class="${c.t==='area'?'full':''}"><small>${esc(c.l)}</small><span>${esc(v===''||v==null?'—':v)}</span></div>`; }).join('');
+  const it = E.item(x);
+  return {titulo:E.titulo, back:true, body:`<div class="dtitle">${esc(it.t1)}</div><div class="kv">${kv}</div>${acciones}`};
+};
+const D = {};
+D.animal = (a, acciones) => {
+  const ek = espDeValor(a.especie); const E = ESP[ek];
+  const madre = animalPorCodigo(a.madre), padre = animalPorCodigo(a.padre);
+  const crias = DB.animales.filter(x=>x.madre===a.codigo||x.padre===a.codigo);
+  const ret = C.retiro(a); const pt = C.parto(a);
+  const trats = DB.tratamientos.filter(t=>t.animal===a.codigo||(t.animal==='Todo el hato'&&t.especie===a.especie)).sort((x,y)=>y.fecha.localeCompare(x.fecha));
+  const rel = (lbl, r, cod) => r ? `<button class="relcard" style="--ac:${E.ac}" data-a="go" data-p="${jp({v:'detalle',p:{ent:'animales',id:r.id}})}"><div class="av">${r.foto?fotoTag(r.foto):E.emo}</div><div><small>${lbl}</small><b>${esc(r.nombre)}</b><small>${esc(r.codigo)}</small></div></button>`
+    : `<div class="relcard none"><div class="av">?</div><div><small>${lbl}</small><b>${cod?esc(cod):'Desconocido'}</b></div></div>`;
+  let body = `<div class="hero" style="--ac:${E.ac}">${paisaje(ek)}${a.foto?fotoTag(a.foto,'Foto de '+a.nombre):`<span class="big-emo">${E.emo}</span>`}
+    <div class="ph"><label>${ic('cam')} ${a.foto?'Cambiar foto':'Agregar foto'}<input type="file" accept="image/*" data-foto="${a.id}"></label></div></div>
+    <div class="dtitle">${esc(a.nombre||'Sin nombre')}</div>
+    <div class="dsub"><span class="badge">${esc(a.codigo)}</span><span class="badge">${esc(a.sexo)}</span><span class="badge">${esc(a.raza||'—')}</span><span class="badge ${estadoBadge(a.estado)}">${esc(a.estado)}</span></div>`;
+  if (ret.leche || ret.carne) body += `<div class="alert bad" style="cursor:default"><div class="ai">⛔</div><div><b>Período de retiro activo</b><span>${ret.leche?`Leche: no vender hasta el ${fFecha(ret.leche)}. `:''}${ret.carne?`Carne: hasta el ${fFecha(ret.carne)}.`:''}</span></div></div>`;
+  body += `<div class="kv"><div><small>Edad</small><span>${edad(a.nacimiento)}</span></div><div><small>Peso</small><span>${a.pesoKg?num(a.pesoKg)+' kg':'—'}</span></div>
+    <div><small>Nacimiento</small><span>${fFecha(a.nacimiento)}</span></div><div><small>${ek==='ovejas'?'Corral':'Potrero'}</small><span>${esc(nombrePotrero(a.potreroId))}</span></div></div>`;
+  if (a.sexo==='Hembra'){
+    body += `<div class="section-title">Reproducción</div><div class="card pad" style="--ac:${E.ac}">`;
+    if (a.servicio && a.estado==='Preñada'){ const av = diasEntre(a.servicio,hoy()); const d = diasEntre(hoy(),pt);
+      body += `<div style="display:flex;justify-content:space-between"><span>Servicio: <b>${fFecha(a.servicio)}</b></span><span class="badge ${d<=15?'warn':'info'}">${d>=0?`Faltan ${d} días`:'Fecha pasada'}</span></div>
+        <div class="steps"><div class="on" style="flex:${Math.min(av,E.gest)}"></div><div style="flex:${Math.max(E.gest-av,0)}"></div></div>
+        <div class="muted" style="font-size:13px">Parto probable: <b style="color:var(--text)">${fFecha(pt)}</b> · gestación de ${E.gest} días</div>`;
+    } else body += `<div class="muted">Sin servicio registrado. Próximo celo esperado cada ~${E.celo} días.</div><button class="btn tonal block mt" data-a="editar" data-p="${jp({ent:'animales',id:a.id})}">Registrar servicio</button>`;
+    body += `</div>`;
+  }
+  body += `<div class="section-title">Genealogía</div><div class="rel">${rel('Madre',madre,a.madre)}${rel('Padre',padre,a.padre)}</div>`;
+  if (crias.length) body += `<div class="section-title">Crías (${crias.length})</div><div class="rel">${crias.map(c=>rel(c.sexo==='Hembra'?'Hija':'Hijo',c)).join('')}</div>`;
+  body += `<div class="section-title">Historial sanitario</div>` + (trats.length ? `<div class="list">${trats.map(t=>fila('tratamientos',t,E.ac)).join('')}</div>` : `<div class="muted">Sin tratamientos registrados.</div>`);
+  body += `<button class="btn tonal block mt" data-a="nuevo" data-p="${jp({ent:'tratamientos',esp:ek,pre:{animal:a.codigo}})}">${ic('plus')}Aplicar tratamiento</button>` + acciones;
+  return {titulo:`Ficha de ${E.valor==='Vaca'?'la vaca':'la oveja'}`, emo:E.emo, back:true, body, ac:E.ac};
+};
+D.galpon = (g, acciones) => {
+  const E = ESP.gallinas;
+  const pts = Array.from({length:14},(_,i)=>{const f=sumarDias(hoy(),i-13); return {l:fCorta(f), v:C.huevosDia(f,g.id)};});
+  const hHoy = C.huevosDia(hoy(),g.id); const post = g.aves ? hHoy*100/g.aves : 0; const [ct, r] = C.cartones(hHoy);
+  const perd = DB.perdidas.filter(p=>p.galponId===g.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  let body = `<div class="hero" style="--ac:${E.ac};height:170px">${paisaje('gallinas')}<span class="big-emo" style="font-size:64px;margin:-30px 0 0 120px">🐔</span></div><div class="dtitle">${esc(g.nombre)}</div>
+    <div class="dsub"><span class="badge">${esc(g.raza||'Sin raza')}</span><span class="badge">Ingreso: ${fFecha(g.fechaIngreso)}</span></div>
+    ${statStrip([{l:'Aves',v:num(g.aves),ac:E.ac},{l:'Postura hoy',v:post.toFixed(1)+'%',ac:E.ac},{l:'Mortalidad',v:C.mortalidad(g).toFixed(1)+'%',ac:E.ac}])}
+    <div class="section-title">Huevos hoy</div><div class="card pad"><b style="font-size:22px">${num(hHoy)}</b> huevos · <span class="badge info">${ct} cartones${r?` + ${r}`:''}</span></div>
+    <div class="section-title">Producción · 14 días</div><div class="card pad">${lineChart(pts,E.ac)}</div>
+    <div class="btnrow mt"><button class="btn fill" data-a="nuevo" data-p="${jp({ent:'huevos',pre:{galponId:g.id}})}">🥚 Registrar huevos</button><button class="btn out" data-a="nuevo" data-p="${jp({ent:'perdidas',pre:{galponId:g.id}})}">⚠️ Pérdida</button></div>
+    <div class="section-title">Pérdidas registradas (${perd.length})</div>${perd.length?`<div class="list">${perd.slice(0,10).map(p=>fila('perdidas',p,E.ac)).join('')}</div>`:'<div class="muted">Sin pérdidas.</div>'}${acciones}`;
+  return {titulo:'Galpón', emo:'🐔', back:true, body, ac:E.ac};
+};
+D.comprador = (c, acciones) => {
+  const ps = DB.pedidos.filter(p=>p.compradorId===c.id).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const total = ps.filter(p=>p.estado==='Entregado').reduce((s,p)=>s+C.totalPedido(p),0);
+  const cart = ps.filter(p=>p.estado==='Entregado').reduce((s,p)=>s+Number(p.cartones),0);
+  const body = `<div class="hero" style="--ac:var(--c-venta);height:140px;font-size:64px;font-weight:700;color:var(--c-venta)">${esc(c.nombre[0])}</div>
+    <div class="dtitle">${esc(c.nombre)}</div><div class="dsub"><span class="badge">${esc(c.tipo)}</span></div>
+    <div class="kv"><div><small>Teléfono</small><span>${esc(c.telefono||'—')}</span></div><div><small>Dirección</small><span>${esc(c.direccion||'—')}</span></div></div>
+    <div class="mt">${statStrip([{l:'Total comprado',v:dineroCorto(total),ac:'var(--c-venta)'},{l:'Cartones',v:num(cart),ac:'var(--c-venta)'},{l:'Pedidos',v:ps.length,ac:'var(--c-venta)'}])}</div>
+    <button class="btn fill block mt" data-a="nuevo" data-p="${jp({ent:'pedidos',pre:{compradorId:c.id}})}">${ic('plus')}Nuevo pedido para ${esc(c.nombre.split(' ')[0])}</button>
+    <div class="section-title">Historial de pedidos</div>${ps.length?`<div class="list">${ps.map(p=>fila('pedidos',p,'var(--c-venta)')).join('')}</div>`:'<div class="muted">Aún no tiene pedidos.</div>'}${acciones}`;
+  return {titulo:'Comprador', emo:'👥', back:true, body};
+};
+D.pedido = (p, acciones) => {
+  const c = DB.compradores.find(x=>x.id===p.compradorId);
+  const paso = p.estado==='Pendiente'?1:p.estado==='Entregado'?2:0;
+  const body = `<div class="dtitle">${dinero(C.totalPedido(p))}</div><div class="dsub"><span class="badge ${estadoBadge(p.estado)}">${p.estado}</span><span class="badge">${fFecha(p.fecha)}</span></div>
+    <div class="card pad" style="--ac:${p.estado==='Cancelado'?'var(--danger)':'var(--c-venta)'}"><div class="muted" style="font-size:13px">Progreso</div>
+      <div class="steps"><div class="${paso>=1||p.estado==='Cancelado'?'on':''}"></div><div class="${paso>=2||p.estado==='Cancelado'?'on':''}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span>Pendiente</span><span>${p.estado==='Cancelado'?'Cancelado':'Entregado'}</span></div></div>
+    <div class="kv mt"><div><small>Cartones</small><span>${num(p.cartones)} (${num(p.cartones*HUEVOS_POR_CARTON)} huevos)</span></div><div><small>Precio por cartón</small><span>${dinero(p.precio)}</span></div>
+      <div class="full"><small>Notas</small><span>${esc(p.notas||'—')}</span></div></div>
+    <div class="section-title">Comprador</div>${c?fila('compradores',c,'var(--c-venta)'):'<div class="muted">Eliminado</div>'}
+    ${p.estado==='Pendiente'?`<div class="btnrow mt"><button class="btn fill" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Entregado'})}">${ic('check')}Marcar entregado</button><button class="btn out" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Cancelado'})}">Cancelar</button></div>`:''}${acciones}`;
+  return {titulo:'Pedido', emo:'🧾', back:true, body};
+};
+
+// --------- Reportes ---------
+V.reportes = () => {
+  const dias = {semana:7, mes:30, todo:9999}[S.periodo];
+  const enP = f => diasEntre(f, hoy()) < dias;
+  const ped = DB.pedidos.filter(p=>p.estado==='Entregado'&&enP(p.fecha));
+  const ing = ped.reduce((s,p)=>s+C.totalPedido(p),0);
+  const gas = DB.gastos.filter(g=>enP(g.fecha)).reduce((s,g)=>s+Number(g.monto),0);
+  const util = ing-gas;
+  let body = `<div class="seg">${[['semana','Semana'],['mes','Mes'],['todo','Todo']].map(([k,l])=>`<button class="${S.periodo===k?'on':''}" data-a="periodo" data-p="${jp({v:k})}">${l}</button>`).join('')}</div>`;
+  body += `<div class="grid2"><div class="stat accent" style="--ac:var(--ok)"><div class="v">${dineroCorto(ing)}</div><div class="l">Ingresos</div></div><div class="stat accent" style="--ac:var(--danger)"><div class="v">${dineroCorto(gas)}</div><div class="l">Gastos</div></div>
+    <div class="stat accent" style="--ac:${util>=0?'var(--ok)':'var(--danger)'};grid-column:1/-1"><div class="v">${dinero(util)}</div><div class="l">Utilidad del período ${ing?`· margen ${(util*100/ing).toFixed(0)}%`:''}</div></div></div>`;
+
+  // Serie temporal
+  let pts;
+  const serie = (vf) => {
+    if (S.periodo==='todo'){ const meses=[]; for(let i=5;i>=0;i--){ const d=new Date(); d.setDate(1); d.setMonth(d.getMonth()-i); meses.push(`${d.getFullYear()}-${pad2(d.getMonth()+1)}`); }
+      return meses.map(m=>({l:new Date(m+'-15T12:00:00').toLocaleDateString('es-CR',{month:'short'}), v:vf(f=>f.startsWith(m))})); }
+    return Array.from({length:dias},(_,i)=>{const f=sumarDias(hoy(),i-dias+1); return {l:fCorta(f), v:vf(x=>x===f)};});
+  };
+  if (S.grafica==='huevos') pts = serie(m=>DB.huevos.filter(h=>m(h.fecha)).reduce((s,h)=>s+Number(h.cantidad),0));
+  else pts = serie(m=>DB.pedidos.filter(p=>p.estado==='Entregado'&&m(p.fecha)).reduce((s,p)=>s+C.totalPedido(p),0) - DB.gastos.filter(g=>m(g.fecha)).reduce((s,g)=>s+Number(g.monto),0));
+  body += `<div class="section-title">Tendencia</div><div class="card pad"><div class="seg" style="margin-top:0"><button class="${S.grafica==='huevos'?'on':''}" data-a="grafica" data-p="${jp({v:'huevos'})}">🥚 Huevos</button><button class="${S.grafica==='util'?'on':''}" data-a="grafica" data-p="${jp({v:'util'})}">💰 Utilidad</button></div>
+    ${lineChart(pts, S.grafica==='huevos'?'var(--c-gallina)':'var(--ok)', S.grafica==='huevos'?undefined:dineroCorto)}</div>`;
+  body += `<div class="section-title">Gastos por categoría</div><div class="card pad">${barras(agrupar(DB.gastos.filter(g=>enP(g.fecha)),g=>g.categoria,g=>Number(g.monto)),'var(--danger)',dineroCorto)}</div>`;
+  body += `<div class="section-title">Ventas por comprador</div><div class="card pad">${barras(agrupar(ped,p=>nombreComprador(p.compradorId),p=>C.totalPedido(p)).slice(0,5),'var(--c-venta)',dineroCorto)}</div>`;
+  body += `<div class="section-title">Pérdidas de aves por causa</div><div class="card pad">${barras(agrupar(DB.perdidas.filter(p=>enP(p.fecha)),p=>p.causa,p=>Number(p.cantidad)),'var(--c-gallina)')}</div>`;
+  body += `<div class="section-title">Gastos por área</div><div class="card pad">${barras(agrupar(DB.gastos.filter(g=>enP(g.fecha)),g=>ESP[espDeValor(g.area)]?.nombre||g.area,g=>Number(g.monto)),'var(--primary)',dineroCorto)}</div>`;
+  body += `<button class="btn tonal block mt" data-a="go" data-p="${jp({v:'lista',p:{ent:'gastos'}})}">💸 Ver y registrar gastos</button>`;
+  return {titulo:'Reportes', hero:{kicker:'Finanzas y producción', titulo:'Tus <em>números</em>', escena:'campo'}, body};
+};
+
+// --------- Más ---------
+V.mas = () => {
+  const r = ROLES[S.rol];
+  const item = (i, t, d, a, p) => `<button class="row" data-a="${a}" data-p="${jp(p||{})}"><div class="av">${i}</div><div class="tx"><div class="t1">${esc(t)}</div><div class="t2">${esc(d)}</div></div></button>`;
+  let body = `<div class="card pad" style="display:flex;gap:14px;align-items:center"><div class="av" style="width:56px;height:56px">${ic('user')}</div><div><b style="font-size:17px">${esc(DB.usuarios.find(u=>u.rol===S.rol)?.nombre||r.etq)}</b><div class="muted">${r.etq}</div></div></div>`;
+  body += `<div class="section-title">Gestión</div><div class="list">`;
+  if (puede('STOCK')) body += item('📦','Inventario general','Insumos de todas las áreas','go',{v:'inventario'});
+  if (puede('REPORTES')) body += item('💸','Gastos','Registro de egresos','go',{v:'lista',p:{ent:'gastos'}});
+  if (puede('USUARIOS')) body += item('👥','Usuarios y roles','Accesos de tu equipo','go',{v:'lista',p:{ent:'usuarios'}});
+  body += `</div><div class="section-title">Datos y sincronización</div>${tarjetaGH()}<div>`;
+  body += `</div><div class="section-title">Preferencias</div><div class="card pad">
+    <div class="muted" style="font-size:13px;margin-bottom:8px">Tema (el oscuro ayuda a ahorrar batería; el claro se lee mejor bajo el sol)</div>
+    <div class="seg" style="margin:0 0 14px">${[['auto','Automático'],['light','Claro'],['dark','Oscuro']].map(([k,l])=>`<button class="${CFG.tema===k?'on':''}" data-a="tema" data-p="${jp({v:k})}">${l}</button>`).join('')}</div>
+    <div class="muted" style="font-size:13px;margin-bottom:8px">Moneda</div>
+    <div class="seg" style="margin:0">${[['Q','Q'],['₡','₡'],['$','$']].map(([k,l])=>`<button class="${CFG.moneda===k?'on':''}" data-a="moneda" data-p="${jp({v:k})}">${l}</button>`).join('')}</div></div>
+    <div class="section-title">Sesión</div><div class="list">${item('🔄','Cambiar de usuario','Elegir otro rol en este dispositivo','logout')}${META.gh?'':item('♻️','Restablecer datos de ejemplo','Solo mientras no esté conectado a GitHub','reset')}</div>
+    <div class="note">Pecuaria · funciona sin internet y sincroniza con GitHub.</div>`;
+  return {titulo:'Más', hero:{kicker:ROLES[S.rol].etq, titulo:'Más <em>opciones</em>', escena:'campo'}, body};
+};
+function tarjetaGH(){
+  const x = textoSync();
+  if (!META.gh) return `<div class="card pad"><div style="display:flex;gap:12px;align-items:flex-start"><div class="av">☁️</div><div><b>Sin sincronizar</b><div class="muted" style="font-size:13px;margin-top:2px">Los datos viven solo en este dispositivo. Conéctalo a GitHub para verlos desde otros teléfonos.</div></div></div><button class="btn fill block mt" data-a="abrirGH">Conectar con GitHub</button></div>`;
+  return `<div class="card pad"><div style="display:flex;gap:12px;align-items:flex-start"><div class="av">☁️</div><div style="min-width:0"><b>${esc(META.gh.owner)}/${esc(META.gh.repo)}</b><div class="muted" style="font-size:13px;margin-top:2px">${esc(META.gh.dispositivo)} · rama ${esc(META.gh.rama)}</div>
+    <div class="mt"><span class="syncpill ${x.c}" style="cursor:default"><span class="si">${x.i}</span><span class="tx">${esc(x.t)}</span></span></div>${SYNC.error&&SYNC.estado==='error'?`<div class="hint" style="color:var(--danger)">${esc(SYNC.error)}</div>`:''}</div></div>
+    <div class="btnrow mt"><button class="btn tonal" data-a="sync">${ic('reset')}Sincronizar ahora</button><button class="btn out" data-a="abrirGH">Editar</button></div>
+    <button class="btn danger block mt" data-a="desconectarGH">Desconectar este dispositivo</button></div>`;
+}
+V.inventario = () => {
+  const areas = ['gallinas','vacas','ovejas'];
+  const body = areas.map(k=>{ const l = DB.stock.filter(s=>s.area===ESP[k].valor);
+    return `<div class="section-title">${ESP[k].emo} ${ESP[k].nombre}</div><div class="list">${l.map(s=>fila('stock',s,ESP[k].ac)).join('')||'<div class="muted">Sin productos.</div>'}</div><button class="btn out block mt" data-a="nuevo" data-p="${jp({ent:'stock',esp:k})}">${ic('plus')}Agregar a ${ESP[k].nombre}</button>`; }).join('');
+  return {titulo:'Inventario general', emo:'📦', back:true, body};
+};
+
+// ======================= RENDER =======================
+const app = document.getElementById('app');
+// Escena ilustrada (colinas, sol y un detalle por especie)
+function paisaje(tipo='campo'){
+  const extra = {
+    gallinas:`<g fill="var(--hill3)"><rect x="54" y="44" width="58" height="30" rx="2"/><path d="M48 46 83 24l35 22z"/><rect x="76" y="56" width="12" height="18" fill="var(--sun)" opacity=".55"/></g>`,
+    vacas:`<g stroke="var(--hill3)" stroke-width="3" stroke-linecap="round"><path d="M30 60v18M62 58v20M94 60v18M126 62v16"/><path d="M28 64q50-6 100 0M28 72q50-6 100 0" fill="none" stroke-width="2"/></g>`,
+    ovejas:`<g fill="#fff" opacity=".85"><ellipse cx="70" cy="62" rx="15" ry="10"/><circle cx="60" cy="58" r="7"/><circle cx="80" cy="58" r="7"/><ellipse cx="112" cy="68" rx="11" ry="7"/><circle cx="105" cy="65" r="5"/></g><g fill="var(--hill3)"><circle cx="54" cy="63" r="4"/><circle cx="101" cy="69" r="3"/></g>`,
+    campo:`<g fill="none" stroke="var(--band-muted)" stroke-width="1.6" stroke-linecap="round" opacity=".7"><path d="M210 30q4-4 8 0q4-4 8 0"/><path d="M236 20q3-3 6 0q3-3 6 0"/></g>`,
+  }[tipo] || '';
+  return `<svg class="scene" viewBox="0 0 400 96" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <circle class="sun" cx="322" cy="40" r="20" fill="var(--sun)" opacity=".95"/>
+    <circle cx="322" cy="40" r="30" fill="var(--sun)" opacity=".15"/>
+    <path d="M0 70 C70 40 140 48 210 64 S330 44 400 58 V96 H0Z" fill="var(--hill1)"/>
+    ${extra}
+    <path d="M0 84 C90 64 180 70 260 80 S360 72 400 78 V96 H0Z" fill="var(--hill3)" opacity=".55"/>
+  </svg>`;
+}
+
+// Conteo animado de cifras (0 → valor)
+function contar(raiz){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  raiz.querySelectorAll('.stat .v, .hubcard .big b, .tile .cnt').forEach(el=>{
+    const m = el.textContent.match(/^([^\d-]*)(-?[\d\s  .,]*\d)(.*)$/); if (!m) return;
+    const crudo = m[2].replace(/[\s  ]/g,''); const dec = (crudo.split(',')[1]||'').length;
+    const fin = parseFloat(crudo.replace(/\./g,'').replace(',','.')); if (isNaN(fin) || Math.abs(fin) < 2) return;
+    const t0 = performance.now(), dur = 900;
+    const paso = ahora => { const k = Math.min(1,(ahora-t0)/dur), e = 1-Math.pow(1-k,3);
+      el.textContent = m[1] + (fin*e).toLocaleString('es-CR',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + m[3];
+      if (k<1) requestAnimationFrame(paso); };
+    requestAnimationFrame(paso);
+  });
+}
+
+function render(navegando){
+  aplicarTema();
+  if (!S.rol){ app.innerHTML = vLogin(); cascada(app); return; }
+  const cur = actual(); const vista = (V[cur.v] || V.inicio)(cur.p || {});
+  const tabs = pestanas();
+  const temaBtn = `<button class="syncpill" data-a="sync" aria-label="Estado de sincronización"></button><button class="iconbtn" data-a="temaRapido" aria-label="Cambiar tema">${ic(temaEfectivo()==='dark'?'sun':'moon')}</button>`;
+  const backBtn = vista.back ? `<button class="iconbtn" data-a="back" aria-label="Volver">${ic('back')}</button>` : '';
+  const cabecera = vista.hero
+    ? `<header class="herotop">${paisaje(vista.hero.escena)}<div class="row1">${backBtn}<span class="kicker">${vista.hero.kicker||''}</span>${temaBtn}</div><h1>${vista.hero.titulo}</h1></header>`
+    : `<header class="topbar" id="tb">${backBtn}<h1>${vista.emo?`<span class="dot">${vista.emo}</span>`:''}<span>${esc(vista.titulo)}${vista.sub?`<span class="sub">${esc(vista.sub)}</span>`:''}</span></h1>${temaBtn}</header>`;
+  app.innerHTML = `${cabecera}
+    <main class="content ${navegando?'page':'quieto'}">${vista.body}</main>
+    ${vista.fab?`<button class="fab" data-a="${vista.fab.a}" data-p="${jp(vista.fab.p)}" aria-label="Agregar">${ic('plus')}</button>`:''}
+    <nav class="bottomnav">${tabs.map(t=>`<button class="navitem ${S.tab===t.k?'on':''}" data-a="tab" data-p="${jp({v:t.k})}"><span class="pill">${ic(t.i)}</span>${t.l}</button>`).join('')}</nav>`;
+  if (navegando){ window.scrollTo({top:0,behavior:'instant'}); contar(app); }
+  pintarSync(); hidratarFotos(app);
+  cascada(app);
+  const q = document.getElementById('q');
+  if (q && vista.lista){ q.addEventListener('input', ()=>{ S.q = q.value; const l=document.getElementById('lista'); l.innerHTML = cuerpoLista(vista.lista); cascada(l); hidratarFotos(l); }); }
+  document.querySelectorAll('input[data-foto]').forEach(inp=>inp.addEventListener('change', e=>cargarFoto(inp.dataset.foto, e.target.files[0])));
+}
+// Entrada en cascada: cada elemento llega un instante después del anterior
+function cascada(raiz){ raiz.querySelectorAll('.anim-in').forEach((el,i)=>{ el.style.animationDelay = Math.min(i*40, 480)+'ms'; }); }
+
+function vLogin(){
+  return `<div class="login"><header class="herotop">${paisaje('campo')}<div class="logo">🐔 🐄 🐑</div><h1>Pecu<em>aria</em></h1><p>¿Quién usa este dispositivo?</p></header>
+    <div class="rolelist">${Object.entries(ROLES).map(([k,r])=>`<button class="row anim-in" data-a="rol" data-p="${jp({v:k})}"><div class="av">${ic(k==='ADMIN'?'shield':k==='CONTADOR'?'money':k==='VETERINARIO'?'med':'user')}</div><div class="tx"><div class="t1">${r.etq}</div><div class="t2">${pestanasDe(k)}</div></div></button>`).join('')}</div>
+    <div class="note">${META.gh?`Sincronizado con ${esc(META.gh.owner)}/${esc(META.gh.repo)}`:'Datos guardados en este dispositivo'}</div></div>`;
+}
+function pestanasDe(rol){ const prev=S.rol; S.rol=rol; const t=pestanas().map(x=>x.l).join(' · '); S.rol=prev; return t; }
+window.addEventListener('scroll', ()=>{ document.getElementById('tb')?.classList.toggle('scrolled', window.scrollY>4); }, {passive:true});
+
+// ---------------- Tema ----------------
+const temaEfectivo = () => CFG.tema==='auto' ? (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light') : CFG.tema;
+function aplicarTema(){ document.documentElement.dataset.theme = CFG.tema; }
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', ()=>render());
+
+// ---------------- Snackbar (Mensajero) ----------------
+let snackT;
+function snack(msg, err=false){ const s=document.getElementById('snack'); s.textContent=msg; s.className='snack on'+(err?' err':''); clearTimeout(snackT); snackT=setTimeout(()=>s.className='snack'+(err?' err':''), 2800); }
+
+// ---------------- Diálogo de confirmación (DialogoConfirmacion) ----------------
+let onOk=null;
+function confirmar(titulo, texto, ok, okLbl='Eliminar'){
+  const d=document.getElementById('dialog'); onOk=ok;
+  d.innerHTML=`<h3>${esc(titulo)}</h3><p>${esc(texto)}</p><div class="btnrow"><button class="btn out" data-a="cerrarDialogo">Cancelar</button><button class="btn danger" data-a="okDialogo">${esc(okLbl)}</button></div>`;
+  d.classList.add('on'); document.getElementById('scrim').classList.add('on');
+}
+function cerrarDialogo(){ document.getElementById('dialog').classList.remove('on'); if(!document.getElementById('sheet').classList.contains('on')) document.getElementById('scrim').classList.remove('on'); }
+
+// ---------------- Formulario en hoja inferior (DialogoFormulario) ----------------
+let FORM=null;
+function abrirFormulario(ent, x, p={}){
+  const E = ENT[ent];
+  const ctxVal = E.ctx ? (x ? x[E.ctx] : ESP[p.esp]?.valor) : null;
+  if (E.ctx && !ctxVal){ ir('elegirEspecie',{ent}); return; }
+  const campos = E.campos({especie:ctxVal});
+  FORM = {ent, id:x?.id||null, campos, ctxVal, viejo: x?{...x}:null};
+  const val = c => x ? (x[c.k] ?? '') : (p.pre?.[c.k] ?? c.def ?? '');
+  const opts = c => (c.op||[]).map(o=>Array.isArray(o)?o:[o,o]);
+  const html = campos.map(c=>{
+    const v = val(c); let inp;
+    if (c.t==='select') inp = `<select name="${c.k}">${!c.req||v===''?'':''}${opts(c).map(([k,l])=>`<option value="${esc(k)}" ${String(k)===String(v)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+    else if (c.t==='area') inp = `<textarea name="${c.k}">${esc(v)}</textarea>`;
+    else inp = `<input name="${c.k}" type="${c.t==='number'?'number':c.t||'text'}" ${c.t==='number'?'inputmode="decimal" step="any" min="0"':''} value="${esc(v)}">`;
+    let hint = c.hint==='stock' ? `Disponibles: ${num(C.cartonesDisponibles(x?.id))} cartones` : c.hint;
+    return `<div class="field" data-k="${c.k}"><label>${esc(c.l)}${c.req?' *':''}</label>${inp}${hint?`<div class="hint">${esc(hint)}</div>`:''}<div class="err">Este campo es obligatorio</div></div>`;
+  }).join('');
+  const ctxTxt = ctxVal ? ` · ${ESP[espDeValor(ctxVal)].emo} ${ESP[espDeValor(ctxVal)].nombre}` : '';
+  const sh = document.getElementById('sheet');
+  sh.innerHTML = `<div class="grab"></div><h2>${x?'Editar':'Nuevo'} ${E.uno}${ctxTxt}</h2><form class="body" id="frm" novalidate>${html}<div class="formerr" id="ferr"></div></form>
+    <div class="foot"><button class="btn out" data-a="cerrarForm">Cancelar</button><button class="btn fill" data-a="guardar">${ic('check')}Guardar</button></div>`;
+  sh.classList.add('on'); document.getElementById('scrim').classList.add('on');
+  document.getElementById('frm').addEventListener('submit', e=>{e.preventDefault(); guardar();});
+  setTimeout(()=>sh.querySelector('input,select,textarea')?.focus({preventScroll:true}), 280);
+}
+function cerrarForm(){ document.getElementById('sheet').classList.remove('on'); document.getElementById('scrim').classList.remove('on'); FORM=null; }
+function guardar(){
+  if (!FORM || FORM.ent==='_gh') return; const E = ENT[FORM.ent]; const f = document.getElementById('frm');
+  const d = {}; let ok = true;
+  FORM.campos.forEach(c=>{
+    const el = f.elements[c.k]; let v = el.value.trim();
+    const box = f.querySelector(`.field[data-k="${c.k}"]`); box.classList.remove('bad');
+    if (c.req && v===''){ box.classList.add('bad'); box.querySelector('.err').textContent='Este campo es obligatorio'; ok=false; }
+    if (c.t==='number' && v!==''){ v = Number(v); if (isNaN(v) || v<0){ box.classList.add('bad'); box.querySelector('.err').textContent='Ingresa un número válido'; ok=false; } }
+    if (c.unico && v && COL(FORM.ent).some(r=>r[c.k]===v && r.id!==FORM.id)){ box.classList.add('bad'); box.querySelector('.err').textContent='Ya existe un registro con este código'; ok=false; }
+    d[c.k] = v;
+  });
+  if (E.ctx) d[E.ctx] = FORM.ctxVal;
+  const ferr = document.getElementById('ferr'); ferr.style.display='none';
+  if (!ok) return;
+  if (E.validar){ const m = E.validar(d, FORM.viejo); if (m){ ferr.textContent = m; ferr.style.display='block'; return; } }
+  const lista = COL(FORM.ent);
+  if (FORM.id){ const i = lista.findIndex(r=>r.id===FORM.id); E.onSave?.(d, FORM.viejo);
+    // al cambiar el código de un animal se actualizan referencias de genealogía
+    if (FORM.ent==='animales' && FORM.viejo.codigo!==d.codigo) DB.animales.forEach(a=>{ if(a.madre===FORM.viejo.codigo){a.madre=d.codigo;toca(a);} if(a.padre===FORM.viejo.codigo){a.padre=d.codigo;toca(a);} });
+    lista[i] = toca({...lista[i], ...d}); }
+  else { E.onSave?.(d, null); lista.push(toca({id:uid(), foto:'', ...d})); }
+  guardarDB(); const eraNuevo = !FORM.id; const uno = E.uno; cerrarForm(); render();
+  snack(`${uno[0].toUpperCase()+uno.slice(1)} ${eraNuevo?'guardado':'actualizado'}`);
+}
+
+// ---------------- Foto (EditorImagen): reduce antes de guardar ----------------
+function cargarFoto(id, file){
+  if (!file) return; const rd = new FileReader();
+  rd.onload = () => { const img = new Image(); img.onload = () => {
+      const max = 1024, k = Math.min(1, max/Math.max(img.width, img.height));
+      const cv = document.createElement('canvas'); cv.width = Math.round(img.width*k); cv.height = Math.round(img.height*k);
+      cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+      cv.toBlob(async blob => {
+        const a = DB.animales.find(x=>x.id===id); if (!a || !blob) return;
+        const ruta = `fotos/${a.codigo.replace(/[^\w-]/g,'_')}-${uid()}.jpg`;
+        await IDB.set('fotos', ruta, {blob, pendiente:true});
+        urlsFoto.set('gh:'+ruta, URL.createObjectURL(blob));
+        a.foto = 'gh:'+ruta; toca(a); SYNC.pendFotos++;
+        guardarDB(); render(); snack(navigator.onLine||!META.gh ? 'Foto guardada' : 'Foto guardada · se subirá al tener señal');
+      }, 'image/jpeg', .8);
+    }; img.onerror = () => snack('No se pudo leer la imagen', true); img.src = rd.result; };
+  rd.readAsDataURL(file);
+}
+
+// ---------------- Conexión con GitHub (pantalla) ----------------
+function abrirConexion(){
+  const g = META.gh || {owner:'', repo:'pecuaria-datos', rama:'main', token:'', dispositivo:''};
+  const sh = document.getElementById('sheet');
+  const campo = (k,l,v,t='text',h='') => `<div class="field" data-k="${k}"><label>${l} *</label><input name="${k}" type="${t}" value="${esc(v)}" autocomplete="off" autocapitalize="off" spellcheck="false">${h?`<div class="hint">${h}</div>`:''}<div class="err">Este campo es obligatorio</div></div>`;
+  sh.innerHTML = `<div class="grab"></div><h2>Conectar con GitHub</h2><form class="body" id="frmgh" novalidate>
+    <div class="hint" style="margin:0 4px 6px;font-size:13px;line-height:1.5">Los datos se guardan en <b>datos.json</b> y las fotos en la carpeta <b>fotos/</b> de un repositorio <b>privado</b>. Cada dispositivo se conecta una vez.</div>
+    ${campo('owner','Usuario u organización de GitHub',g.owner,'text','Ejemplo: andy-dev')}
+    ${campo('repo','Repositorio de datos (privado)',g.repo)}
+    ${campo('rama','Rama',g.rama||'main')}
+    ${campo('token','Token de acceso',g.token,'password','Fine-grained, solo para ese repo, con permiso <b>Contents: Read and write</b>.')}
+    ${campo('dispositivo','Nombre de este dispositivo',g.dispositivo,'text','Aparece en el historial de cambios. Ejemplo: Teléfono de Andy')}
+    <div class="formerr" id="ferr"></div></form>
+    <div class="foot"><button class="btn out" data-a="cerrarForm">Cancelar</button><button class="btn fill" data-a="conectarGH" id="btngh">${ic('check')}Conectar</button></div>`;
+  sh.classList.add('on'); document.getElementById('scrim').classList.add('on');
+  FORM = {ent:'_gh', campos:[]};
+  document.getElementById('frmgh').addEventListener('submit', e=>{ e.preventDefault(); accionConectar(); });
+}
+async function accionConectar(){
+  const f = document.getElementById('frmgh'); const d = {}; let ok = true;
+  ['owner','repo','rama','token','dispositivo'].forEach(k=>{ const v=f.elements[k].value.trim(); const box=f.querySelector(`.field[data-k="${k}"]`); box.classList.toggle('bad', !v); if(!v) ok=false; d[k]=v; });
+  const ferr = document.getElementById('ferr'); ferr.style.display='none';
+  if (!ok) return;
+  if (!navigator.onLine){ ferr.textContent='Necesitas internet para conectar el dispositivo la primera vez.'; ferr.style.display='block'; return; }
+  const btn = document.getElementById('btngh'); btn.disabled = true; btn.textContent = 'Conectando…';
+  try {
+    const remoto = await conectarGitHub(d);
+    cerrarForm();
+    if (remoto){
+      const n = COLECCIONES.reduce((s,c)=>s+remoto.datos[c].length,0);
+      elegir('Encontramos datos en GitHub', `El repositorio ya tiene ${num(n)} registros. Este dispositivo los descargará y reemplazará los datos que tenga ahora.`, [
+        {l:'Cancelar', cls:'out', fn:()=>{ META.gh=null; guardarDB(false); render(); }},
+        {l:'Descargar', cls:'fill', fn:async ()=>{ DB = remoto.datos; META.sha = remoto.sha; META.sucio=false; META.ultima=ahora(); await limpiarFotosPendientes(); guardarDB(false); render(true); sincronizar(); snack('Dispositivo conectado'); }},
+      ]);
+    } else {
+      elegir('El repositorio está vacío', '¿Con qué datos quieres empezar? Lo que elijas se subirá a GitHub y lo verán los demás dispositivos.', [
+        {l:'Empezar vacío', cls:'out', fn:async ()=>{ DB = vacia(); await limpiarFotosPendientes(); guardarDB(); render(true); sincronizar({silencioso:false}); snack('Conectado · empezando en blanco'); }},
+        {l:'Subir los datos actuales', cls:'fill', fn:()=>{ guardarDB(); render(true); sincronizar({silencioso:false}); snack('Conectado · subiendo datos'); }},
+      ]);
+    }
+  } catch(e){
+    btn.disabled = false; btn.innerHTML = `${ic('check')}Conectar`;
+    ferr.textContent = e.message==='conflicto' ? 'GitHub rechazó la operación. Revisa la rama.' : e.message; ferr.style.display='block';
+  }
+}
+async function limpiarFotosPendientes(){ for (const [k] of await fotosPendientes()) await IDB.del('fotos', k); SYNC.pendFotos = 0; }
+
+// Diálogo con varias opciones
+let OPS = [];
+function elegir(titulo, texto, ops){
+  OPS = ops; const d=document.getElementById('dialog');
+  d.innerHTML=`<h3>${esc(titulo)}</h3><p>${esc(texto)}</p><div class="btnrow">${ops.map((o,i)=>`<button class="btn ${o.cls||'out'}" data-a="opDialogo" data-p="${jp({i})}">${esc(o.l)}</button>`).join('')}</div>`;
+  d.classList.add('on'); document.getElementById('scrim').classList.add('on');
+}
+
+// ---------------- Acciones ----------------
+const A = {
+  rol:({v})=>{ S.rol=v; META.rol=v; guardarDB(false); S.tab='inicio'; S.pila=[]; render(true); },
+  logout:()=>{ S.rol=null; META.rol=''; guardarDB(false); S.pila=[]; render(true); },
+  tab:({v})=>tab(v), back:()=>atras(),
+  go:({v,p})=>ir(v,p),
+  abrir:({ent,id})=>{ ir('detalle',{ent,id}); },
+  nuevo:(p)=>abrirFormulario(p.ent, null, p),
+  nuevoDesde:(p)=>{ S.pila.pop(); render(); abrirFormulario(p.ent, null, p); },
+  editar:({ent,id})=>abrirFormulario(ent, COL(ent).find(r=>r.id===id)),
+  eliminar:({ent,id})=>{ const E=ENT[ent]; const x=COL(ent).find(r=>r.id===id);
+    confirmar(`¿Eliminar este ${E.uno}?`, `Se eliminará “${E.item(x).t1}”. Esta acción no se puede deshacer.`, ()=>{
+      borrarRegistro(ent, id);
+      if (ent==='perdidas'){ const g=DB.galpones.find(g=>g.id===x.galponId); if(g){ g.aves=Number(g.aves)+Number(x.cantidad); toca(g); } }
+      guardarDB(); cerrarDialogo(); atras(); snack(`${E.uno[0].toUpperCase()+E.uno.slice(1)} eliminado`); }); },
+  estadoPedido:({id,e})=>{ const p=DB.pedidos.find(x=>x.id===id); p.estado=e; toca(p); guardarDB(); render(); snack(`Pedido ${e.toLowerCase()}`); },
+  chip:({v})=>{ S.chip=v; render(); },
+  seg:({v})=>{ S.ventas=v; S.q=''; S.chip=''; render(); },
+  periodo:({v})=>{ S.periodo=v; render(); },
+  grafica:({v})=>{ S.grafica=v; render(); },
+  tema:({v})=>{ CFG.tema=v; guardarDB(false); render(); },
+  temaRapido:()=>{ CFG.tema = temaEfectivo()==='dark'?'light':'dark'; guardarDB(false); render(); },
+  moneda:({v})=>{ CFG.moneda=v; guardarDB(false); render(); snack(`Moneda: ${v}`); },
+  reset:()=>confirmar('¿Restablecer datos?','Se borrarán los cambios hechos en este navegador y se cargarán los datos de ejemplo.',()=>{ DB=normalizar(semilla()); guardarDB(); cerrarDialogo(); render(true); snack('Datos de demostración restablecidos'); },'Restablecer'),
+  cerrarForm, guardar, cerrarDialogo,
+  sync:()=>{ if (!META.gh){ tab('mas'); return; } if (!navigator.onLine){ snack('Sin señal. Tus cambios están guardados en este dispositivo y se subirán solos.'); return; } sincronizar({silencioso:false}); },
+  abrirGH:()=>abrirConexion(),
+  conectarGH:()=>accionConectar(),
+  desconectarGH:()=>confirmar('¿Desconectar este dispositivo?', (META.sucio||SYNC.pendFotos) ? 'Hay cambios que todavía no se subieron a GitHub y se quedarían solo aquí.' : 'Los datos se quedan en este dispositivo, pero dejará de sincronizarse.', ()=>{ META.gh=null; SYNC.estado='local'; guardarDB(false); cerrarDialogo(); render(); snack('Dispositivo desconectado'); }, 'Desconectar'),
+  opDialogo:({i})=>{ const o=OPS[i]; cerrarDialogo(); o?.fn?.(); },
+  okDialogo:()=>onOk?.(),
+};
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-a]'); if (!t) return;
+  const fn = A[t.dataset.a]; if (!fn) return;
+  e.preventDefault(); fn(t.dataset.p ? JSON.parse(t.dataset.p) : {});
+});
+document.getElementById('scrim').addEventListener('click', ()=>{ if (document.getElementById('dialog').classList.contains('on')) cerrarDialogo(); else cerrarForm(); });
+document.addEventListener('keydown', e=>{ if (e.key==='Escape'){ if (document.getElementById('dialog').classList.contains('on')) cerrarDialogo(); else if (FORM) cerrarForm(); } });
+
+(async () => {
+  await cargarDB(); render(true);
+  if (META.gh) sincronizar();
+  if ('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost' || location.hostname==='127.0.0.1')){
+    try { navigator.serviceWorker.register('./sw.js'); } catch(e){}
+  }
+})();
+</script>
+</body>
+</html>
