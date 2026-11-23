@@ -991,7 +991,7 @@ async function abrirFactura(id){
   FORM = {ent:'_factura'};
   sh.innerHTML = `<div class="grab"></div><h2>Factura N.º ${numFactura(p)}</h2>
     <div class="body"><div class="fact-prev"><div class="fact-cargando">Preparando la factura…</div></div>
-      <div class="hint" style="margin:10px 4px 0;line-height:1.5">${puedeCompartirArchivos() ? `Al tocar <b>Enviar</b> se abre el menú de compartir: elige <b>WhatsApp</b> y el chat de <b>${esc(c.nombre)}</b>.` : `En este equipo el archivo se descarga y se abre el chat de <b>${esc(c.nombre)}</b> en WhatsApp para que lo adjuntes.`}</div>
+      <div class="hint" style="margin:10px 4px 0;line-height:1.5">${puedeCompartirArchivos() ? `Al tocar <b>Enviar</b> se abre el menú de compartir: elige <b>WhatsApp</b> y el chat de <b>${esc(c.nombre)}</b>.` : `En esta computadora se abre el chat de <b>${esc(c.nombre)}</b> con el mensaje listo: la <b>imagen</b> se copia para pegarla con Ctrl+V y el <b>PDF</b> se guarda en Descargas para arrastrarlo al chat.`}</div>
       <div class="fact-guardar"><span>Guardar en este dispositivo:</span><button class="btn out" data-a="factDescargar" data-p="${jp({t:'png'})}">${ic('down')}Imagen</button><button class="btn out" data-a="factDescargar" data-p="${jp({t:'pdf'})}">${ic('down')}PDF</button></div>
     </div>
     <div class="foot"><button class="btn tonal" data-a="factEnviar" data-p="${jp({t:'png'})}" disabled>🖼️ Enviar imagen</button><button class="btn fill" data-a="factEnviar" data-p="${jp({t:'pdf'})}" disabled>📄 Enviar PDF</button></div>`;
@@ -1011,26 +1011,45 @@ async function abrirFactura(id){
 function puedeCompartirArchivos(){
   try { return !!(navigator.canShare && navigator.canShare({files:[new File([new Blob(['x'],{type:'image/png'})],'x.png',{type:'image/png'})]})); } catch(e){ return false; }
 }
-function descargarBlob(blob, nombre){
+// Descargas: en la vista previa de claude.ai se usa su permiso de descargas;
+// en GitHub Pages, la descarga normal del navegador.
+let DL = null;
+try { if (window.claude?.use) window.claude.use('downloads').then(d=>{ DL = d; }).catch(()=>{}); } catch(e){}
+async function descargarBlob(blob, nombre){
+  if (DL){ try { await DL.save({filename:nombre, data:blob}); return true; } catch(e){ if (e?.code==='declined') return false; } }
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nombre; document.body.appendChild(a); a.click();
   setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+  return true;
+}
+async function copiarImagen(blob){
+  try { if (!navigator.clipboard?.write || !window.ClipboardItem) return false;
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]); return true; } catch(e){ return false; }
 }
 async function enviarFactura(tipo){
   const p = DB.pedidos.find(x=>x.id===FACT.id); if (!p || !FACT.png) return;
   const blob = tipo==='pdf' ? FACT.pdf : FACT.png;
   const archivo = new File([blob], `${FACT.nombre}.${tipo}`, {type: blob.type});
   const c = DB.compradores.find(x=>x.id===p.compradorId)||{};
+  // 1) Teléfono: menú de compartir con el archivo adjunto (igual que en BH)
   if (navigator.canShare && navigator.canShare({files:[archivo]})){
     try { await navigator.share({files:[archivo], title:`Factura N.º ${numFactura(p)}`, text: mensajeWA(p)}); marcarEnviada(p, tipo); return; }
-    catch(e){ if (e.name==='AbortError') return; }
+    catch(e){ if (e.name==='AbortError') return; /* otro error: seguir con el plan B */ }
   }
-  // Respaldo (PC o navegadores sin compartir archivos)
-  descargarBlob(blob, archivo.name);
+  // 2) Computadora: WhatsApp no deja adjuntar archivos desde un enlace.
+  //    La imagen se copia al portapapeles (solo pegar) y el archivo se guarda.
   const tel = telWA(c.telefono);
-  const url = tel ? `https://wa.me/${tel}?text=${encodeURIComponent(mensajeWA(p))}` : `https://wa.me/?text=${encodeURIComponent(mensajeWA(p))}`;
-  window.open(url, '_blank', 'noopener');
-  snack(tel ? 'Factura descargada · adjúntala en el chat que se abrió' : 'Factura descargada · el cliente no tiene teléfono registrado');
+  const texto = `${mensajeWA(p)}\n(Adjunto la factura N.º ${numFactura(p)})`;
+  const copiada = tipo==='png' ? await copiarImagen(FACT.png) : false;
+  window.open(tel ? `https://wa.me/${tel}?text=${encodeURIComponent(texto)}` : `https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank', 'noopener');
+  const guardada = await descargarBlob(blob, archivo.name);
   marcarEnviada(p, tipo);
+  const quien = c.nombre ? `el chat de ${c.nombre}` : 'WhatsApp';
+  const pasos = copiada
+    ? `Se abrió ${quien} con el mensaje listo y la imagen de la factura ya está copiada. En el chat, haz clic en el cuadro de mensaje, pega con Ctrl+V (en Mac, Cmd+V) y toca Enviar.`
+    : guardada
+      ? `Se abrió ${quien} con el mensaje listo y la factura se guardó en Descargas (${archivo.name}). Arrástrala desde la barra de descargas del navegador al chat, o usa el clip 📎 → Documento, y toca Enviar.`
+      : `Se abrió ${quien} con el mensaje listo, pero el archivo no se pudo guardar. Usa los botones "Guardar" de la factura y adjúntalo en el chat.`;
+  elegir('Último paso: adjuntar y enviar', pasos, [{l:'Entendido', cls:'fill'}]);
 }
 function marcarEnviada(p, tipo){ p.enviada = new Date().toISOString(); p.enviadaComo = tipo; toca(p); guardarDB(); }
 
