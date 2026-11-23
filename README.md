@@ -17,15 +17,14 @@ sincroniza los datos y las fotos con un repositorio privado de GitHub.
 
 ## Instalación (una sola vez)
 
-### 1. Repositorio de la app (público, con GitHub Pages)
-1. Crea un repo, por ejemplo `pecuaria`.
-2. Sube estos archivos a la raíz: `index.html`, `sw.js`,
-   `manifest.webmanifest`, `icon-192.png`, `icon-512.png`,
-   `apple-touch-icon.png`.
-3. Settings → Pages → Branch: `main` / carpeta `/ (root)` → Save.
-4. La app queda en `https://TU_USUARIO.github.io/pecuaria/`.
+### 1. Repositorio de la app: `AppPecuaria` (público, con GitHub Pages)
+1. Ya contiene todos los archivos de la web (`index.html`, `sw.js`,
+   `manifest.webmanifest`, íconos y `favicon`).
+2. Settings → Pages → Branch: `main` / carpeta `/ (root)` → Save.
+3. La app queda en `https://andygu444.github.io/AppPecuaria/`.
 
-Este repo no contiene datos ni contraseñas, así que puede ser público.
+Este repo es público y no contiene datos ni contraseñas.
+**Nunca uses `AppPecuaria` como repositorio de datos**: cualquiera podría verlos.
 
 ### 2. Repositorio de datos (privado)
 1. Crea otro repo **privado**, por ejemplo `pecuaria-datos`.
@@ -40,7 +39,7 @@ Este repo no contiene datos ni contraseñas, así que puede ser público.
 4. Elige una fecha de vencimiento y copia el token.
 
 ### 4. En cada teléfono
-1. Abre `https://TU_USUARIO.github.io/pecuaria/`.
+1. Abre `https://andygu444.github.io/AppPecuaria/`.
 2. Instálala:
    - Android/Chrome: menú ⋮ → "Instalar aplicación".
    - iPhone/Safari: Compartir → "Agregar a inicio".
