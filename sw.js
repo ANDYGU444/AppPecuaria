@@ -1,6 +1,6 @@
 // Service worker de Pecuaria: guarda la app en el teléfono para que abra sin internet.
 // Cambia VERSION cada vez que subas una nueva versión de index.html.
-const VERSION = 'pecuaria-v2';
+const VERSION = 'pecuaria-v3';
 const APP = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './icon-maskable-192.png', './icon-maskable-512.png', './apple-touch-icon.png', './favicon.ico', './favicon-32.png'];
 
