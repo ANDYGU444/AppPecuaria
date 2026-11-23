@@ -63,6 +63,21 @@ Este repo es público y no contiene datos ni contraseñas.
 - Es un comprobante de venta interno; no sustituye la factura electrónica de
   Hacienda si el negocio está obligado a emitirla.
 
+## Etiquetas para huevos
+- En **Más → Gestión → Etiquetas para huevos** (o desde el panel de Gallinas).
+- Fecha de empaque: hoy por defecto. Mejor antes de: se calcula con los días
+  de vida útil (15 por defecto). Las dos se pueden cambiar.
+- Todo es editable: nombre de la granja, títulos, tipo, cantidad, grado,
+  leyenda, rótulos, línea extra, ícono (gallina, logo o imagen propia) y colores.
+- Hoja: Carta, A4 u Oficio; de 1 a 30 etiquetas por hoja o filas × columnas a
+  gusto; tamaño automático o fijo en cm; márgenes, espacio, bordes de corte y
+  cantidad de hojas.
+- **Imprimir** envía directo a la impresora a tamaño real. También se puede
+  guardar en **PDF** (todas las hojas) o como **imagen**.
+- Al imprimir, usa escala **100 %** (o "Tamaño real") y sin márgenes extra del
+  navegador para que las medidas en cm sean exactas.
+- La plantilla se guarda y se sincroniza con los demás dispositivos.
+
 ## Actualizar la app
 Sube el nuevo `index.html` y cambia `VERSION` en `sw.js`
 (por ejemplo `pecuaria-v2`). Así los teléfonos descargan la versión nueva.
