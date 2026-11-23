@@ -573,7 +573,7 @@ const ahora = () => Date.now();
 const toca = r => { if (r) r._mod = ahora(); return r; };   // marca un registro como cambiado
 const COLECCIONES = ['galpones','huevos','perdidas','potreros','animales','tratamientos','enfermedades','stock','compradores','pedidos','gastos','usuarios','ajustes'];
 function vacia(){ const o = {_borrados:{}}; COLECCIONES.forEach(c=>o[c]=[]); return o; }
-function normalizar(d){ d = d || {}; COLECCIONES.forEach(c=>{ if(!Array.isArray(d[c])) d[c]=[]; }); if(!d._borrados) d._borrados={}; return d; }
+function normalizar(d){ d = d || {}; COLECCIONES.forEach(c=>{ if(!Array.isArray(d[c])) d[c]=[]; }); if(!d._borrados) d._borrados={}; return typeof migrarEstados==='function' ? migrarEstados(d) : d; }
 
 let tGuardar = null;
 function guardarDB(huboCambio = true){
@@ -787,6 +787,9 @@ const EMPRESA_DEF = { id:'empresa', nombre:'Mi Granja', cedula:'', telefono:'', 
   sinpe:'', sinpeNombre:'', iva:0, gracias:'¡Gracias por su compra!', autoFactura:'Sí' };
 const empresa = () => ({...EMPRESA_DEF, ...(DB.ajustes||[]).find(r=>r.id==='empresa')});
 
+// "Cancelado" = ya se pagó (uso en Costa Rica). Una venta que no se hizo es "Anulado".
+const estaPagado = p => (p.pago||'Cancelado')==='Cancelado' || p.pago==='Pagado';
+function migrarEstados(d){ (d.pedidos||[]).forEach(p=>{ if (p.estado==='Cancelado') p.estado='Anulado'; if (p.pago==='Pagado') p.pago='Cancelado'; }); return d; }
 function siguienteNumero(){ return DB.pedidos.reduce((m,p)=>Math.max(m, Number(p.numero)||0), 0) + 1; }
 const numFactura = p => String(p.numero||0).padStart(6,'0');
 function asegurarNumero(p){
@@ -883,9 +886,9 @@ async function dibujarFactura(p){
   dc.slice(0,3).forEach((t,i)=>texto(x, ajustar(x,t,cw-64,'400 22px Inter, "Segoe UI", Roboto, system-ui, sans-serif'), M+32, y+142+i*32, {f:'400 22px Inter, "Segoe UI", Roboto, system-ui, sans-serif', c:GRIS}));
   const px2 = M+cw+28; tarjeta(px2, 'DETALLES DEL PAGO');
   const filaKV = (k, v, yy, color) => { texto(x, k, px2+32, yy, {f:'400 22px Inter, "Segoe UI", Roboto, system-ui, sans-serif', c:GRIS}); texto(x, v, px2+cw-32, yy, {f:'600 22px Inter, "Segoe UI", Roboto, system-ui, sans-serif', c:color||TINTA, a:'right'}); };
-  const pagado = (p.pago||'Pagado')==='Pagado' && p.metodoPago!=='Crédito';
+  const pagado = estaPagado(p), anulado = p.estado==='Anulado';
   filaKV('Método', p.metodoPago||'Efectivo', y+104);
-  filaKV('Estado', p.estado==='Cancelado' ? 'Anulada' : pagado ? 'Pagado' : 'Pendiente de pago', y+146, p.estado==='Cancelado' ? '#B23A2E' : pagado ? '#2F6B4A' : '#9A6210');
+  filaKV('Estado', anulado ? 'Venta anulada' : pagado ? 'Cancelado' : 'Pendiente de pago', y+146, anulado ? '#B23A2E' : pagado ? '#2F6B4A' : '#9A6210');
   filaKV('Atendió', ajustar(x, p.atendio || ROLES[S.rol]?.etq || '—', cw/2, '600 22px Inter, "Segoe UI", Roboto, system-ui, sans-serif'), y+188);
 
   // Tabla de detalle
@@ -918,14 +921,16 @@ async function dibujarFactura(p){
 
   // Sello
   const sello = (txt, color, cx, cy) => { x.save(); x.translate(cx,cy); x.rotate(-0.21); x.globalAlpha=.85; x.strokeStyle=color; x.lineWidth=5;
-    rr(x,-150,-52,300,104,18); x.stroke(); x.lineWidth=2; rr(x,-138,-40,276,80,12); x.stroke();
+    x.font='900 46px Nunito, "Segoe UI", Roboto, system-ui, sans-serif'; if ('letterSpacing' in x) x.letterSpacing='6px';
+    const sw = Math.max(300, x.measureText(txt).width + 76); if ('letterSpacing' in x) x.letterSpacing='0px';
+    rr(x,-sw/2,-52,sw,104,18); x.stroke(); x.lineWidth=2; rr(x,-sw/2+12,-40,sw-24,80,12); x.stroke();
     texto(x, txt, 0, 16, {f:'900 46px Nunito, "Segoe UI", Roboto, system-ui, sans-serif', c:color, a:'center', ls:6}); x.restore(); };
-  if (p.estado==='Cancelado') sello('ANULADA', '#B23A2E', M+190, y+170);
-  else if (pagado) sello('PAGADO', '#2F6B4A', M+190, y+170);
+  if (anulado) sello('ANULADA', '#B23A2E', M+240, y+185);
+  else if (pagado) sello('CANCELADO', '#2F6B4A', M+240, y+185);
 
   // Instrucciones de pago (SINPE)
   y += 240;
-  if (emp.sinpe && (!pagado || p.metodoPago==='SINPE Móvil') && p.estado!=='Cancelado'){
+  if (emp.sinpe && (!pagado || p.metodoPago==='SINPE Móvil') && !anulado){
     x.fillStyle='#FBEBD0'; rr(x, M, y, W-2*M, 104, 22); x.fill();
     texto(x, 'SINPE MÓVIL', M+32, y+42, {f:'600 17px Inter, "Segoe UI", Roboto, system-ui, sans-serif', c:'#9A6210', ls:3});
     texto(x, `${emp.sinpe}${emp.sinpeNombre?'  ·  a nombre de '+emp.sinpeNombre:''}`, M+32, y+78, {f:'800 28px Nunito, "Segoe UI", Roboto, system-ui, sans-serif', c:TINTA});
@@ -1105,9 +1110,9 @@ function semilla(){
     const n = d % 3 === 0 ? 2 : 1;
     for (let k = 0; k < n; k++){
       const c = compradores[rnd(0,5)];
-      const estado = d <= 1 ? 'Pendiente' : (Math.random() < .07 ? 'Cancelado' : 'Entregado');
+      const estado = d <= 1 ? 'Pendiente' : (Math.random() < .07 ? 'Anulado' : 'Entregado');
       const metodo = ['Efectivo','SINPE Móvil','SINPE Móvil','Transferencia','Crédito'][rnd(0,4)];
-      pedidos.push({id:uid(), numero:pedidos.length+1, creado:`${sumarDias(H,-d)}T${pad2(rnd(6,17))}:${pad2(rnd(0,59))}:00`, compradorId:c.id, fecha:sumarDias(H,-d), cartones: c.tipo==='Mayorista' ? rnd(40,70) : rnd(10,30), precio: c.tipo==='Mayorista' ? 1700 : 1900, estado, metodoPago:metodo, pago: metodo==='Crédito'||estado==='Pendiente' ? 'Pendiente de pago' : 'Pagado', atendio:'Andy', notas:''});
+      pedidos.push({id:uid(), numero:pedidos.length+1, creado:`${sumarDias(H,-d)}T${pad2(rnd(6,17))}:${pad2(rnd(0,59))}:00`, compradorId:c.id, fecha:sumarDias(H,-d), cartones: c.tipo==='Mayorista' ? rnd(40,70) : rnd(10,30), precio: c.tipo==='Mayorista' ? 1700 : 1900, estado, metodoPago:metodo, pago: metodo==='Crédito'||estado==='Pendiente' ? 'Pendiente de pago' : 'Cancelado', atendio:'Andy', notas:''});
     }
   }
   const cats = ['Alimento','Medicinas','Mano de obra','Mantenimiento','Transporte','Otros'];
@@ -1133,7 +1138,7 @@ const C = {
   huevosDia: (f=hoy(), gid) => DB.huevos.filter(h=>h.fecha===f && (!gid||h.galponId===gid)).reduce((s,h)=>s+Number(h.cantidad||0),0),
   postura: (f=hoy()) => { const a = C.totalAves(); return a ? C.huevosDia(f)*100/a : 0; },
   totalHuevos: () => DB.huevos.reduce((s,h)=>s+Number(h.cantidad||0),0),
-  comprometidos: (excluirId) => DB.pedidos.filter(p=>p.estado!=='Cancelado' && p.id!==excluirId).reduce((s,p)=>s+Number(p.cartones||0),0),
+  comprometidos: (excluirId) => DB.pedidos.filter(p=>p.estado!=='Anulado' && p.id!==excluirId).reduce((s,p)=>s+Number(p.cartones||0),0),
   cartonesDisponibles: (excluirId) => Math.floor(C.totalHuevos()/HUEVOS_POR_CARTON) - C.comprometidos(excluirId),
   cartones: h => [Math.floor(h/HUEVOS_POR_CARTON), h%HUEVOS_POR_CARTON],
   mortalidad: g => g.avesIniciales ? (g.avesIniciales - g.aves)*100/g.avesIniciales : 0,
@@ -1156,7 +1161,7 @@ const nombrePotrero = id => DB.potreros.find(p=>p.id===id)?.nombre || '—';
 const animalPorCodigo = c => DB.animales.find(a=>a.codigo===c);
 
 // ---------------- Entidades (equivale a PantallaCRUD + DialogoFormulario) ----------------
-const estadoBadge = e => ({Pendiente:'warn', Entregado:'ok', Cancelado:'bad', Preñada:'info', Lactando:'ok', Seco:'', Activo:'', Vendido:'bad', Muerto:'bad', 'En uso':'ok', Descanso:'warn'}[e] ?? '');
+const estadoBadge = e => ({Pendiente:'warn', Entregado:'ok', Anulado:'bad', Cancelado:'ok', 'Pendiente de pago':'warn', Preñada:'info', Lactando:'ok', Seco:'', Activo:'', Vendido:'bad', Muerto:'bad', 'En uso':'ok', Descanso:'warn'}[e] ?? '');
 const ENT = {
   galpones:{ titulo:'Galpones', uno:'galpón', emo:'🏠', detalle:'galpon',
     campos:()=>[{k:'nombre',l:'Nombre',req:1},{k:'raza',l:'Raza / línea genética'},{k:'aves',l:'Aves actuales',t:'number',req:1},{k:'avesIniciales',l:'Aves al ingresar',t:'number'},{k:'fechaIngreso',l:'Fecha de ingreso',t:'date'}],
@@ -1207,15 +1212,15 @@ const ENT = {
   compradores:{ titulo:'Compradores', uno:'comprador', detalle:'comprador',
     chips:{k:'tipo', v:['Tienda','Restaurante','Mayorista','Particular']},
     campos:()=>[{k:'nombre',l:'Nombre o negocio',req:1},{k:'tipo',l:'Tipo',t:'select',op:['Tienda','Restaurante','Mayorista','Particular']},{k:'telefono',l:'Teléfono',t:'tel'},{k:'direccion',l:'Dirección'}],
-    item:c=>{const ps=DB.pedidos.filter(p=>p.compradorId===c.id&&p.estado!=='Cancelado'); return {av:esc(c.nombre[0]||'?'), t1:c.nombre, t2:`${c.tipo} · ${c.telefono||'Sin teléfono'}`, rt:`<b>${ps.length}</b><span class="muted">pedidos</span>`};},
+    item:c=>{const ps=DB.pedidos.filter(p=>p.compradorId===c.id&&p.estado!=='Anulado'); return {av:esc(c.nombre[0]||'?'), t1:c.nombre, t2:`${c.tipo} · ${c.telefono||'Sin teléfono'}`, rt:`<b>${ps.length}</b><span class="muted">pedidos</span>`};},
     resumen:l=>[{l:'Compradores',v:l.length}] },
   pedidos:{ titulo:'Pedidos', uno:'pedido', detalle:'pedido',
-    chips:{k:'estado', v:['Pendiente','Entregado','Cancelado']},
-    campos:()=>[{k:'compradorId',l:'Comprador',t:'select',req:1,op:DB.compradores.map(c=>[c.id,c.nombre])},{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'cartones',l:'Cartones',t:'number',req:1,hint:'stock'},{k:'precio',l:'Precio por cartón (₡)',t:'number',req:1,def:1900},{k:'estado',l:'Estado de entrega',t:'select',op:['Pendiente','Entregado','Cancelado'],def:'Pendiente'},{k:'metodoPago',l:'Método de pago',t:'select',op:['Efectivo','SINPE Móvil','Transferencia','Crédito'],def:'Efectivo'},{k:'pago',l:'Estado del pago',t:'select',op:['Pagado','Pendiente de pago'],def:'Pagado'},{k:'notas',l:'Notas',t:'area'}],
+    chips:{k:'estado', v:['Pendiente','Entregado','Anulado']},
+    campos:()=>[{k:'compradorId',l:'Comprador',t:'select',req:1,op:DB.compradores.map(c=>[c.id,c.nombre])},{k:'fecha',l:'Fecha',t:'date',req:1,def:hoy()},{k:'cartones',l:'Cartones',t:'number',req:1,hint:'stock'},{k:'precio',l:'Precio por cartón (₡)',t:'number',req:1,def:1900},{k:'estado',l:'Estado de entrega',t:'select',op:['Pendiente','Entregado','Anulado'],def:'Pendiente',hint:'Anulado = la venta no se hizo; los cartones vuelven al inventario'},{k:'metodoPago',l:'Método de pago',t:'select',op:['Efectivo','SINPE Móvil','Transferencia','Crédito'],def:'Efectivo'},{k:'pago',l:'Estado del pago',t:'select',op:['Cancelado','Pendiente de pago'],def:'Cancelado',hint:'Cancelado = el cliente ya pagó'},{k:'notas',l:'Notas',t:'area'}],
     item:p=>({av:'🧾', t1:nombreComprador(p.compradorId), t2:`${p.numero?'N.º '+numFactura(p)+' · ':''}${p.cartones} cartones · ${fFecha(p.fecha)}`, rt:`<b>${dineroCorto(C.totalPedido(p))}</b><span class="badge ${p.estado==='Pendiente'?'hot':estadoBadge(p.estado)}">${p.estado}</span>`}),
     resumen:l=>[{l:'Pendientes',v:l.filter(p=>p.estado==='Pendiente').length},{l:'Cartones disp.',v:num(C.cartonesDisponibles())}],
     validar:(d, viejo)=>{ // PedidosRepositorio: evita sobreventas
-      if (d.estado==='Cancelado') return '';
+      if (d.estado==='Anulado') return '';
       const disp = C.cartonesDisponibles(viejo?.id);
       return Number(d.cartones) > disp ? `Solo hay ${num(disp)} cartones disponibles.` : ''; } },
   ajustes:{ titulo:'Perfil de facturación', uno:'perfil de facturación',
@@ -1541,16 +1546,17 @@ D.comprador = (c, acciones) => {
 D.pedido = (p, acciones) => {
   const c = DB.compradores.find(x=>x.id===p.compradorId);
   const paso = p.estado==='Pendiente'?1:p.estado==='Entregado'?2:0;
-  const body = `<div class="dgrid"><div><div class="dtitle">${dinero(totalesFactura(p).total)}</div><div class="dsub">${p.numero?`<span class="badge">N.º ${numFactura(p)}</span>`:''}<span class="badge ${estadoBadge(p.estado)}">${p.estado}</span><span class="badge ${(p.pago||'Pagado')==='Pagado'?'ok':'warn'}">${esc(p.pago||'Pagado')}</span><span class="badge">${fFecha(p.fecha)}</span></div>
+  const body = `<div class="dgrid"><div><div class="dtitle">${dinero(totalesFactura(p).total)}</div><div class="dsub">${p.numero?`<span class="badge">N.º ${numFactura(p)}</span>`:''}<span class="badge ${estadoBadge(p.estado)}">${p.estado}</span><span class="badge ${estaPagado(p)?'ok':'warn'}">${estaPagado(p)?'Cancelado':'Pendiente de pago'}</span><span class="badge">${fFecha(p.fecha)}</span></div>
     <button class="btn fill block" style="margin-bottom:14px" data-a="abrirFactura" data-p="${jp({id:p.id})}">🧾 Ver y enviar factura</button>
     ${p.enviada?`<div class="hint" style="margin:-4px 4px 12px">Enviada como ${p.enviadaComo==='pdf'?'PDF':'imagen'} el ${fFecha(p.enviada.slice(0,10))}</div>`:''}
-    <div class="card pad" style="--ac:${p.estado==='Cancelado'?'var(--danger)':'var(--c-venta)'}"><div class="muted" style="font-size:13px">Progreso</div>
-      <div class="steps"><div class="${paso>=1||p.estado==='Cancelado'?'on':''}"></div><div class="${paso>=2||p.estado==='Cancelado'?'on':''}"></div></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px"><span>Pendiente</span><span>${p.estado==='Cancelado'?'Cancelado':'Entregado'}</span></div></div>
+    <div class="card pad" style="--ac:${p.estado==='Anulado'?'var(--danger)':'var(--c-venta)'}"><div class="muted" style="font-size:13px">Progreso</div>
+      <div class="steps"><div class="${paso>=1||p.estado==='Anulado'?'on':''}"></div><div class="${paso>=2||p.estado==='Anulado'?'on':''}"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span>Pendiente</span><span>${p.estado==='Anulado'?'Anulado':'Entregado'}</span></div></div>
     <div class="kv mt"><div><small>Cartones</small><span>${num(p.cartones)} (${num(p.cartones*HUEVOS_POR_CARTON)} huevos)</span></div><div><small>Precio por cartón</small><span>${dinero(p.precio)}</span></div><div><small>Método de pago</small><span>${esc(p.metodoPago||'Efectivo')}</span></div><div><small>Atendió</small><span>${esc(p.atendio||'—')}</span></div>
       <div class="full"><small>Notas</small><span>${esc(p.notas||'—')}</span></div></div>
     </div><div><div class="section-title">Comprador</div>${c?fila('compradores',c,'var(--c-venta)'):'<div class="muted">Eliminado</div>'}
-    ${p.estado==='Pendiente'?`<div class="btnrow mt"><button class="btn fill" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Entregado'})}">${ic('check')}Marcar entregado</button><button class="btn out" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Cancelado'})}">Cancelar</button></div>`:''}${acciones}</div></div>`;
+    ${p.estado==='Pendiente'?`<div class="btnrow mt"><button class="btn fill" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Entregado'})}">${ic('check')}Marcar entregado</button><button class="btn out" data-a="estadoPedido" data-p="${jp({id:p.id,e:'Anulado'})}">Anular venta</button></div>`:''}
+    ${!estaPagado(p)&&p.estado!=='Anulado'?`<button class="btn tonal block mt" data-a="marcarCancelado" data-p="${jp({id:p.id})}">${ic('check')}Marcar como cancelado (pagado)</button>`:''}${acciones}</div></div>`;
   return {titulo:'Pedido', emo:'🧾', back:true, body};
 };
 
@@ -1853,7 +1859,8 @@ const A = {
       borrarRegistro(ent, id);
       if (ent==='perdidas'){ const g=DB.galpones.find(g=>g.id===x.galponId); if(g){ g.aves=Number(g.aves)+Number(x.cantidad); toca(g); } }
       guardarDB(); cerrarDialogo(); atras(); snack(`${E.uno[0].toUpperCase()+E.uno.slice(1)} eliminado`); }); },
-  estadoPedido:({id,e})=>{ const p=DB.pedidos.find(x=>x.id===id); p.estado=e; toca(p); guardarDB(); render(); snack(`Pedido ${e.toLowerCase()}`); },
+  estadoPedido:({id,e})=>{ const p=DB.pedidos.find(x=>x.id===id); p.estado=e; toca(p); guardarDB(); render(); snack(e==='Anulado'?'Venta anulada':`Pedido ${e.toLowerCase()}`); },
+  marcarCancelado:({id})=>{ const p=DB.pedidos.find(x=>x.id===id); p.pago='Cancelado'; toca(p); guardarDB(); render(); snack('Pedido cancelado (pagado)'); },
   chip:({v})=>{ S.chip=v; render(); },
   seg:({v})=>{ S.ventas=v; S.q=''; S.chip=''; render(); },
   periodo:({v})=>{ S.periodo=v; render(); },
