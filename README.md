@@ -49,6 +49,20 @@ Este repo es público y no contiene datos ni contraseñas.
    reales) o **Subir los datos actuales** (los de ejemplo).
    Los demás teléfonos: **Descargar**.
 
+## Facturas
+- Al registrar una venta se abre su factura: número consecutivo, fecha y hora,
+  datos del cliente, método y estado del pago, monto en letras y sellos
+  PAGADO / ANULADA.
+- Los datos del negocio se configuran en **Más → Perfil de facturación**
+  (nombre, cédula, teléfono, correo, dirección, SINPE Móvil, IVA y mensaje).
+- **Enviar imagen** o **Enviar PDF**: en el teléfono abre el menú de compartir
+  (elige WhatsApp y el chat del cliente). En PC descarga el archivo y abre el
+  chat del cliente en WhatsApp Web para adjuntarlo.
+- WhatsApp no permite que una página envíe mensajes sola; el envío siempre
+  requiere un toque final en WhatsApp.
+- Es un comprobante de venta interno; no sustituye la factura electrónica de
+  Hacienda si el negocio está obligado a emitirla.
+
 ## Actualizar la app
 Sube el nuevo `index.html` y cambia `VERSION` en `sw.js`
 (por ejemplo `pecuaria-v2`). Así los teléfonos descargan la versión nueva.
